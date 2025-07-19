@@ -63,12 +63,53 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Handle preflight requests
-app.options('*', cors(corsOptions));
+// Handle preflight requests BEFORE other middleware
+app.options('*', (req, res) => {
+  const origin = req.get('Origin');
+  console.log(`🔄 OPTIONS preflight request for: ${req.path} from origin: ${origin}`);
+  
+  // Set CORS headers for preflight
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else if (!origin) {
+    res.header('Access-Control-Allow-Origin', '*');
+  } else {
+    // For debugging, allow all origins
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Max-Age', '86400'); // 24 hours
+  
+  // Send success response for preflight
+  res.status(200).end();
+});
 
 // Request logging for debugging
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - Origin: ${req.get('Origin')}`);
+  next();
+});
+
+// Ensure CORS headers on all responses
+app.use((req, res, next) => {
+  const origin = req.get('Origin');
+  
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else if (!origin) {
+    res.header('Access-Control-Allow-Origin', '*');
+  } else {
+    // For debugging, allow all origins
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
   next();
 });
 
@@ -88,8 +129,17 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/typing-te
 
 // Routes
 console.log('📋 Registering API routes...');
-app.use('/api/users', userRoutes);
-console.log('✅ Registered: /api/users/*');
+
+// Add debugging for userRoutes specifically
+console.log('🔍 Loading userRoutes module...');
+try {
+  console.log('✅ userRoutes loaded successfully');
+  app.use('/api/users', userRoutes);
+  console.log('✅ Registered: /api/users/* (including POST /api/users/login)');
+} catch (error) {
+  console.error('❌ Error loading userRoutes:', error);
+}
+
 app.use('/api/tests', testRoutes);
 console.log('✅ Registered: /api/tests/*');
 app.use('/api/stats', statsRoutes);
@@ -121,30 +171,39 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+// Debug endpoint to test login route specifically
+app.all('/api/users/login-test', (req, res) => {
+  res.status(200).json({
+    message: 'Login route path is reachable',
+    method: req.method,
+    path: req.path,
+    origin: req.get('Origin'),
+    headers: req.headers
+  });
+});
+
 // 404 handler with CORS headers
 app.use('*', (req, res) => {
   // Get the origin from the request
   const origin = req.get('Origin');
   
-  // Set CORS headers explicitly
-  if (origin && allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  } else if (!origin) {
-    res.header('Access-Control-Allow-Origin', '*');
-  } else {
-    // For debugging, allow the origin anyway
-    res.header('Access-Control-Allow-Origin', origin);
-  }
+  console.log(`❌ 404 - Route not found: ${req.method} ${req.originalUrl}`);
+  console.log(`🌐 Origin: ${origin}`);
+  console.log(`📊 Request details:`);
+  console.log(`  - User-Agent: ${req.get('User-Agent')}`);
+  console.log(`  - Content-Type: ${req.get('Content-Type')}`);
+  console.log(`  - All headers:`, req.headers);
   
+  // Set CORS headers explicitly (belt and suspenders approach)
+  res.header('Access-Control-Allow-Origin', origin || '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   res.header('Access-Control-Allow-Credentials', 'true');
   
-  console.log(`❌ 404 - Route not found: ${req.method} ${req.originalUrl}`);
-  console.log(`🌐 Origin: ${origin}`);
   console.log(`📋 Available routes:`);
   console.log(`  GET  /api/health`);
   console.log(`  GET  /api/test`);
+  console.log(`  ALL  /api/users/login-test`);
   console.log(`  POST /api/users/login`);
   console.log(`  POST /api/users/register`);
   console.log(`  GET  /api/users/profile`);
@@ -153,9 +212,11 @@ app.use('*', (req, res) => {
     error: 'Route not found',
     message: `Cannot ${req.method} ${req.originalUrl}`,
     origin: origin,
+    timestamp: new Date().toISOString(),
     availableRoutes: [
       'GET /api/health',
       'GET /api/test',
+      'ALL /api/users/login-test',
       'POST /api/users/login',
       'POST /api/users/register',
       'GET /api/users/profile'
