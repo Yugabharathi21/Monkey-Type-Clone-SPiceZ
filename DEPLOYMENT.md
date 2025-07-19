@@ -88,12 +88,19 @@ VITE_NODE_ENV=production
 
 In the Vercel dashboard, go to Settings → Environment Variables and add:
 
+**For Production:**
 ```
 VITE_API_BASE_URL=https://your-backend-app.onrender.com/api
 VITE_APP_NAME=TypeMonkey
 VITE_APP_VERSION=1.0.0
 VITE_NODE_ENV=production
 ```
+
+**Important Notes:**
+- Replace `your-backend-app` with your actual Render service name
+- Make sure to include `/api` at the end of the backend URL
+- Set these for "Production" environment in Vercel
+- Do NOT use the `@secret` syntax in vercel.json (it's been removed)
 
 ### 4. Update Backend CORS
 
