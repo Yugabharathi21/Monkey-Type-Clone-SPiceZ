@@ -28,12 +28,41 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // CORS configuration
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://monkey-type-clone-s-pice-z.vercel.app',
+  // Add your actual Vercel domain here
+].filter(Boolean); // Remove any undefined values
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+
+// Request logging for debugging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - Origin: ${req.get('Origin')}`);
+  next();
+});
 
 // Body parser middleware
 app.use(express.json({ limit: '10mb' }));
@@ -68,11 +97,29 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// 404 handler
+// 404 handler with CORS headers
 app.use('*', (req, res) => {
+  // Ensure CORS headers are present
+  res.header('Access-Control-Allow-Origin', req.get('Origin') || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  console.log(`404 - Route not found: ${req.method} ${req.originalUrl}`);
+  console.log('Available routes:');
+  console.log('  GET  /api/health');
+  console.log('  POST /api/users/login');
+  console.log('  POST /api/users/register');
+  console.log('  GET  /api/users/profile');
+  
   res.status(404).json({
     error: 'Route not found',
     message: `Cannot ${req.method} ${req.originalUrl}`,
+    availableRoutes: [
+      'GET /api/health',
+      'POST /api/users/login',
+      'POST /api/users/register',
+      'GET /api/users/profile'
+    ]
   });
 });
 
