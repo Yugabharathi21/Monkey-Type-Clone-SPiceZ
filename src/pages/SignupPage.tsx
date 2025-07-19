@@ -111,10 +111,10 @@ const SignupPage: React.FC = () => {
               ← Back to Home
             </Link>
             <h1>Create Account</h1>
-            <p>Join thousands of users who trust ModernApp</p>
+            <p>Join thousands of users who trust TypeMaster</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="auth-form">
+            <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="firstName">First Name</label>

@@ -1,18 +1,15 @@
-/* Type Monkey Inspired Authentication Styles */
+/* Modern Clean Authentication Styles */
 .auth-container {
   min-height: 100vh;
-  background: var(--background);
+  background: #f8f9fa;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  font-family: 'Roboto Mono', 'Fira Code', 'Consolas', monospace;
   opacity: 0;
   animation: pageLoad 1s ease-out forwards;
   position: relative;
   overflow: hidden;
-  color: var(--text-primary);
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .auth-wrapper {
@@ -27,18 +24,17 @@
 }
 
 .auth-card {
-  background: var(--background-secondary);
-  border: 2px solid var(--border-color);
+  background: #ffffff;
+  border: 1px solid #e9ecef;
   padding: 3rem;
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: 
-    0 4px 6px rgba(0, 0, 0, 0.3),
-    0 1px 3px rgba(0, 0, 0, 0.2);
+    0 4px 20px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   transform-style: preserve-3d;
-  border-radius: 2px;
 }
 
 .auth-card::before {
@@ -48,17 +44,17 @@
   left: -100%;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(14, 14, 14, 0.6), transparent);
+  background: linear-gradient(90deg, transparent, rgba(108, 117, 125, 0.3), transparent);
   animation: slideInHorizontal 2s ease-out 1s forwards;
 }
 
 .auth-card:hover {
   box-shadow: 
     0 20px 60px rgba(0, 0, 0, 0.12), 
-    0 25px 80px rgba(255, 99, 71, 0.15),
-    0 0 0 1px rgba(255, 99, 71, 0.08);
+    0 25px 80px rgba(108, 117, 125, 0.15),
+    0 0 0 1px rgba(108, 117, 125, 0.08);
   transform: translateY(-5px) rotateY(3deg) rotateX(2deg);
-  border-color: rgba(255, 99, 71, 0.2);
+  border-color: rgba(108, 117, 125, 0.2);
 }
 
 .signup-card {
@@ -74,15 +70,15 @@
 }
 
 .auth-header h1 {
-  color: #e2b714;
+  color: #007bff;
   font-size: 1.8rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .auth-header p {
-  color: #646669;
+  color: #6c757d;
   font-size: 1rem;
   font-weight: 400;
 }
@@ -90,7 +86,7 @@
 .back-link {
   display: inline-flex;
   align-items: center;
-  color: #646669;
+  color: #6c757d;
   text-decoration: none;
   font-weight: 400;
   margin-bottom: 1.5rem;
@@ -100,24 +96,25 @@
   transform: translateX(-10px) rotateZ(-5deg);
   animation: slideInLeftRotate 0.5s ease-out 0.4s forwards;
   padding: 0.5rem 0.75rem;
-  border-radius: 4px;
+  border-radius: 8px;
   border: 1px solid transparent;
 }
 
 .back-link:hover {
-  color: #e2b714;
+  color: #007bff;
   transform: translateX(5px) rotateZ(2deg) scale(1.05);
-  background: rgba(226, 183, 20, 0.1);
-  border-color: rgba(226, 183, 20, 0.2);
+  background: rgba(0, 123, 255, 0.1);
+  border-color: rgba(0, 123, 255, 0.2);
 }
 
 .auth-header h1 {
-  color: #1a1a1a;
+  color: #007bff;
   font-size: 2rem;
-  font-weight: 400;
+  font-weight: 600;
   margin-bottom: 0.75rem;
   letter-spacing: -0.5px;
   position: relative;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .auth-header h1::after {
@@ -127,8 +124,8 @@
   left: 50%;
   transform: translateX(-50%);
   width: 0;
-  height: 1px;
-  background: #1a1a1a;
+  height: 2px;
+  background: #007bff;
   animation: expandWidth 0.8s ease-out 1.2s forwards;
 }
 
@@ -159,58 +156,58 @@
 
 .form-group label {
   display: block;
-  color: #d1d0c5;
+  color: #495057;
   font-weight: 500;
   margin-bottom: 0.5rem;
   font-size: 0.95rem;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .form-input {
   width: 100%;
   padding: 1rem;
-  border: 2px solid #525252;
+  border: 2px solid #e9ecef;
   font-size: 1rem;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  background: #323437;
-  color: #d1d0c5;
-  font-family: 'Roboto Mono', monospace;
+  background: #ffffff;
+  color: #495057;
+  font-family: 'Segoe UI', sans-serif;
   transform-origin: center;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #e2b714;
+  border-color: #007bff;
   box-shadow: 
-    0 0 0 2px rgba(226, 183, 20, 0.3),
-    0 4px 12px rgba(226, 183, 20, 0.2);
+    0 0 0 2px rgba(0, 123, 255, 0.3),
+    0 4px 12px rgba(0, 123, 255, 0.2);
   transform: scale(1.02) rotateX(2deg);
-  background: #2c2e31;
+  background: #ffffff;
 }
 
 .form-input:hover {
   transform: translateY(-1px) rotateX(1deg);
-  border-color: #e2b714;
-  box-shadow: 0 2px 8px rgba(226, 183, 20, 0.1);
+  border-color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
 }
 
 .form-input.error {
-  border-color: #ca4754;
+  border-color: #dc3545;
 }
 
 .form-input::placeholder {
-  color: #646669;
+  color: #6c757d;
   font-style: italic;
 }
 
 .error-message {
-  color: #ca4754;
+  color: #dc3545;
   font-size: 0.875rem;
   margin-top: 0.25rem;
   display: block;
   font-weight: 400;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 /* Password Strength */
@@ -223,8 +220,9 @@
 
 .strength-bar {
   flex: 1;
-  height: 3px;
+  height: 4px;
   background: #e9ecef;
+  border-radius: 2px;
   overflow: hidden;
 }
 
@@ -238,11 +236,11 @@
 }
 
 .strength-fill.strength-2 {
-  background: #fd7e14;
+  background: #ffc107;
 }
 
 .strength-fill.strength-3 {
-  background: #198754;
+  background: #28a745;
 }
 
 .strength-text {
@@ -255,11 +253,11 @@
 }
 
 .strength-text.strength-2 {
-  color: #fd7e14;
+  color: #ffc107;
 }
 
 .strength-text.strength-3 {
-  color: #198754;
+  color: #28a745;
 }
 
 /* Form Options */
@@ -290,17 +288,18 @@
 .checkmark {
   width: 18px;
   height: 18px;
-  border: 1px solid #ced4da;
+  border: 2px solid #ced4da;
   margin-right: 0.75rem;
   position: relative;
   transition: all 0.2s ease;
   flex-shrink: 0;
   background: #ffffff;
+  border-radius: 4px;
 }
 
 .checkbox-container input[type="checkbox"]:checked + .checkmark {
-  background: #1a1a1a;
-  border-color: #1a1a1a;
+  background: #007bff;
+  border-color: #007bff;
 }
 
 .checkbox-container input[type="checkbox"]:checked + .checkmark::after {
@@ -314,16 +313,16 @@
 }
 
 .forgot-link {
-  color: #646669;
+  color: #6c757d;
   text-decoration: none;
   font-size: 0.95rem;
   font-weight: 400;
   transition: color 0.2s ease;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .forgot-link:hover {
-  color: #e2b714;
+  color: #007bff;
 }
 
 /* Buttons */
@@ -344,22 +343,22 @@
 
 .btn-primary-full {
   width: 100%;
-  background: #e2b714;
-  color: #323437;
-  border: 2px solid #e2b714;
+  background: #007bff;
+  color: #ffffff;
+  border: 2px solid #007bff;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Segoe UI', sans-serif;
   font-weight: 600;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(226, 183, 20, 0.3);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
 }
 
 .btn-primary-full:hover:not(:disabled) {
-  background: #d1a513;
+  background: #0056b3;
   transform: translateY(-3px) rotateX(5deg) scale(1.02);
-  box-shadow: 0 12px 35px rgba(226, 183, 20, 0.4);
-  border-color: #d1a513;
+  box-shadow: 0 12px 35px rgba(0, 123, 255, 0.4);
+  border-color: #0056b3;
 }
 
 .btn-primary-full:disabled {
@@ -375,7 +374,8 @@
   width: 16px;
   height: 16px;
   border: 2px solid transparent;
-  border-top: 2px solid #ffffff;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
@@ -393,16 +393,16 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: #525252;
+  background: #e9ecef;
 }
 
 .divider span {
-  background: #2c2e31;
+  background: #ffffff;
   padding: 0 1rem;
-  color: #646669;
+  color: #6c757d;
   font-size: 0.95rem;
   font-weight: 400;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .social-login {
@@ -413,22 +413,22 @@
 }
 
 .btn-social {
-  background: #3c3e41;
-  border: 2px solid #525252;
-  color: #d1d0c5;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  color: #495057;
   font-weight: 400;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
-  font-family: 'Roboto Mono', monospace;
-  border-radius: 4px;
+  font-family: 'Segoe UI', sans-serif;
+  border-radius: 8px;
 }
 
 .btn-social:hover {
-  border-color: #e2b714;
-  background: #2c2e31;
-  color: #e2b714;
+  border-color: #007bff;
+  background: #ffffff;
+  color: #007bff;
   transform: translateY(-2px) rotateY(3deg) scale(1.02);
-  box-shadow: 0 6px 20px rgba(226, 183, 20, 0.2);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.2);
 }
 
 .social-icon {
@@ -440,35 +440,35 @@
 .auth-footer {
   text-align: center;
   padding-top: 1.5rem;
-  border-top: 1px solid #525252;
+  border-top: 1px solid #e9ecef;
 }
 
 .auth-footer p {
-  color: #646669;
+  color: #6c757d;
   font-size: 0.95rem;
   font-weight: 400;
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .auth-link {
-  color: #d1d0c5;
+  color: #495057;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
 }
 
 .auth-link:hover {
-  color: #e2b714;
+  color: #007bff;
 }
 
 .link {
-  color: rgba(139, 90, 43, 0.8);
+  color: #007bff;
   text-decoration: underline;
   transition: color 0.2s ease;
 }
 
 .link:hover {
-  color: #ff6347;
+  color: #0056b3;
 }
 
 /* Enhanced Animations with Rotation */

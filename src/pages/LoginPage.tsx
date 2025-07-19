@@ -80,7 +80,7 @@ const LoginPage: React.FC = () => {
             <p>Sign in to your account to continue</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="auth-form">
+            <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
               <label htmlFor="email">Email Address</label>
               <input

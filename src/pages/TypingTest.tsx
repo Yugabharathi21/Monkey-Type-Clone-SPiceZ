@@ -104,6 +104,18 @@ const TypingTest: React.FC = () => {
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
+      // Only handle keyboard events if we're on the typing test page
+      // Check if any form input is currently focused
+      const activeElement = document.activeElement;
+      if (activeElement && (
+        activeElement.tagName === 'INPUT' || 
+        activeElement.tagName === 'TEXTAREA' || 
+        activeElement.tagName === 'SELECT' ||
+        activeElement.hasAttribute('contenteditable')
+      )) {
+        return; // Don't interfere with form inputs
+      }
+
       // Prevent default for most keys except special ones
       if (!['Tab', 'F5', 'F12'].includes(e.key)) {
         e.preventDefault();
