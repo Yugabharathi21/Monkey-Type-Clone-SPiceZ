@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import NavBar from '../components/NavBar';
+import ThemeSelector from '../components/ThemeSelector';
 import '../styles/Dashboard.css';
 
 interface TypingSession {
@@ -139,6 +140,7 @@ const Dashboard: React.FC = () => {
     });
 
     setSessions(filteredSessions);
+    console.log('Filtered sessions:', filteredSessions); // Debug log
 
     // Calculate stats
     if (filteredSessions.length > 0) {
@@ -164,13 +166,25 @@ const Dashboard: React.FC = () => {
 
       setStats({
         totalTests,
-        averageWpm: Math.round(totalWpm / totalTests),
-        averageAccuracy: Math.round(totalAccuracy / totalTests),
+        averageWpm: totalTests > 0 ? Math.round(totalWpm / totalTests) : 0,
+        averageAccuracy: totalTests > 0 ? Math.round(totalAccuracy / totalTests) : 0,
         totalTimeTyping: totalTime,
         bestWpm,
         bestAccuracy,
         totalCharacters: totalChars,
         improvementRate: Math.round(improvementRate)
+      });
+    } else {
+      // Set default stats when no sessions
+      setStats({
+        totalTests: 0,
+        averageWpm: 0,
+        averageAccuracy: 0,
+        totalTimeTyping: 0,
+        bestWpm: 0,
+        bestAccuracy: 0,
+        totalCharacters: 0,
+        improvementRate: 0
       });
     }
   }, [timeRange]);
@@ -199,6 +213,11 @@ const Dashboard: React.FC = () => {
         <div className="analytics-title">
           <h2>Your Typing Analytics</h2>
           <p>Track your progress and improve your typing skills</p>
+        </div>
+
+        <div className="theme-selector-section">
+          <h3>Customize Your Experience</h3>
+          <ThemeSelector />
         </div>
 
         <div className="time-filter">
@@ -276,6 +295,151 @@ const Dashboard: React.FC = () => {
               <h3>Characters Typed</h3>
               <div className="stat-value">{stats.totalCharacters.toLocaleString()}</div>
               <div className="stat-label">keystrokes logged</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="charts-section">
+          <div className="chart-container">
+            <h3>WPM Progress Over Time</h3>
+            <div className="line-chart">
+              {sessions.length > 0 ? (
+                <div className="chart-grid">
+                  {sessions.slice(-7).map((session) => {
+                    const maxWpm = Math.max(...sessions.map(s => s.wpm));
+                    const height = maxWpm > 0 ? (session.wpm / maxWpm) * 100 : 50;
+                    return (
+                      <div key={session.id} className="chart-bar">
+                        <div 
+                          className="bar wpm-bar"
+                          style={{ height: `${height}%` }}
+                          title={`${session.wpm} WPM`}
+                        ></div>
+                        <span className="bar-label">
+                          {new Date(session.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="no-chart-data">
+                  <p>📊 No data available yet</p>
+                  <p>Complete some typing tests to see your progress!</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="chart-container">
+            <h3>Accuracy Trends</h3>
+            <div className="line-chart">
+              {sessions.length > 0 ? (
+                <div className="chart-grid">
+                  {sessions.slice(-7).map((session) => {
+                    const height = session.accuracy;
+                    return (
+                      <div key={session.id} className="chart-bar">
+                        <div 
+                          className="bar accuracy-bar"
+                          style={{ height: `${height}%` }}
+                          title={`${session.accuracy}% Accuracy`}
+                        ></div>
+                        <span className="bar-label">
+                          {new Date(session.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="no-chart-data">
+                  <p>🎯 No accuracy data yet</p>
+                  <p>Start typing to track your accuracy!</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="typing-heatmap-section">
+          <div className="chart-container full-width">
+            <h3>Weekly Typing Activity</h3>
+            <div className="heatmap">
+              <div className="heatmap-grid">
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                  <div key={day} className="heatmap-column">
+                    <div className="heatmap-label">{day}</div>
+                    {[0, 1, 2, 3].map(week => {
+                      const intensity = Math.floor(Math.random() * 4); // Mock data
+                      return (
+                        <div 
+                          key={week}
+                          className={`heatmap-cell intensity-${intensity}`}
+                          title={`${day} - Week ${week + 1}: ${intensity * 25}% activity`}
+                        ></div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+              <div className="heatmap-legend">
+                <span>Less</span>
+                <div className="legend-scale">
+                  {[0, 1, 2, 3].map(level => (
+                    <div key={level} className={`legend-cell intensity-${level}`}></div>
+                  ))}
+                </div>
+                <span>More</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="performance-insights">
+          <h3>Performance Insights</h3>
+          <div className="insights-grid">
+            <div className="insight-card">
+              <div className="insight-icon">📈</div>
+              <div className="insight-content">
+                <h4>Improvement Trend</h4>
+                <p>
+                  {stats.improvementRate >= 0 
+                    ? `You've improved by ${stats.improvementRate}% over time!` 
+                    : `Focus on consistency to improve your average speed.`
+                  }
+                </p>
+              </div>
+            </div>
+            
+            <div className="insight-card">
+              <div className="insight-icon">🎯</div>
+              <div className="insight-content">
+                <h4>Accuracy Analysis</h4>
+                <p>
+                  {stats.averageAccuracy >= 95 
+                    ? 'Excellent accuracy! You maintain high precision while typing.'
+                    : stats.averageAccuracy >= 90 
+                    ? 'Good accuracy. Try to maintain precision while increasing speed.'
+                    : 'Focus on accuracy first - speed will naturally follow.'
+                  }
+                </p>
+              </div>
+            </div>
+
+            <div className="insight-card">
+              <div className="insight-icon">⚡</div>
+              <div className="insight-content">
+                <h4>Speed Target</h4>
+                <p>
+                  {stats.averageWpm >= 60 
+                    ? 'Great typing speed! You\'re above average for most users.'
+                    : stats.averageWpm >= 40 
+                    ? 'Good progress! Aim for 60+ WPM for professional typing.'
+                    : 'Keep practicing! Focus on proper finger placement and rhythm.'
+                  }
+                </p>
+              </div>
             </div>
           </div>
         </div>

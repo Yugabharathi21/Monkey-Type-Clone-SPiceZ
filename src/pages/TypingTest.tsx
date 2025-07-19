@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import NavBar from '../components/NavBar';
+import SessionGraph from '../components/SessionGraph';
 import '../styles/TypingTest.css';
 
 interface TypingStats {
@@ -25,6 +26,8 @@ const TypingTest: React.FC = () => {
   const [isStarted, setIsStarted] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
+  const [wpmHistory, setWpmHistory] = useState<number[]>([]);
+  const [accuracyHistory, setAccuracyHistory] = useState<number[]>([]);
   const [stats, setStats] = useState<TypingStats>({
     wpm: 0,
     accuracy: 0,
@@ -123,14 +126,22 @@ const TypingTest: React.FC = () => {
     const accuracy = totalCharacters > 0 ? (correctCharacters / totalCharacters) * 100 : 0;
     const wpm = timeElapsed > 0 ? Math.round((correctCharacters / 5) / timeElapsed) : 0;
 
-    setStats({
+    const newStats = {
       wpm,
       accuracy: Math.round(accuracy),
       timeElapsed: Math.round(timeElapsed * 60), // back to seconds for display
       totalCharacters,
       correctCharacters,
       incorrectCharacters
-    });
+    };
+
+    setStats(newStats);
+
+    // Update history every few characters for smooth graph updates
+    if (totalCharacters > 0 && totalCharacters % 5 === 0) {
+      setWpmHistory(prev => [...prev, wpm]);
+      setAccuracyHistory(prev => [...prev, Math.round(accuracy)]);
+    }
   };
 
   const resetTest = () => {
@@ -139,6 +150,8 @@ const TypingTest: React.FC = () => {
     setIsStarted(false);
     setIsCompleted(false);
     setStartTime(null);
+    setWpmHistory([]);
+    setAccuracyHistory([]);
     setStats({
       wpm: 0,
       accuracy: 0,
@@ -192,6 +205,18 @@ const TypingTest: React.FC = () => {
             <span className="stat-value">{stats.timeElapsed}s</span>
           </div>
         </div>
+
+        {isStarted && (
+          <div className="session-graph-container">
+            <SessionGraph 
+              wpmHistory={wpmHistory} 
+              accuracyHistory={accuracyHistory}
+              currentWpm={stats.wpm}
+              currentAccuracy={stats.accuracy}
+              isActive={isStarted && !isCompleted}
+            />
+          </div>
+        )}
 
         <div className="text-display" tabIndex={0}>
           {renderText()}
