@@ -1,16 +1,17 @@
-/* Authentication Pages Styles - Tomato-Enhanced E-ink Aesthetic */
+/* Type Monkey Inspired Authentication Styles */
 .auth-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #faf7f4 0%, #f8f6f3 50%, #f5f2ef 100%);
+  background: #323437;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: 'Roboto Mono', 'Fira Code', 'Consolas', monospace;
   opacity: 0;
   animation: pageLoad 1s ease-out forwards;
   position: relative;
   overflow: hidden;
+  color: #d1d0c5;
 }
 
 .auth-wrapper {
@@ -25,14 +26,13 @@
 }
 
 .auth-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(15px);
-  padding: 3.5rem;
-  border: 1px solid rgba(255, 99, 71, 0.1);
+  background: #2c2e31;
+  border: 2px solid #525252;
+  padding: 3rem;
+  border-radius: 8px;
   box-shadow: 
-    0 1px 3px rgba(0, 0, 0, 0.05), 
-    0 15px 50px rgba(255, 99, 71, 0.08),
-    0 0 0 1px rgba(255, 99, 71, 0.02);
+    0 4px 6px rgba(0, 0, 0, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.2);
   position: relative;
   overflow: hidden;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -72,10 +72,24 @@
   animation: fadeInUpRotate 0.6s ease-out 0.6s forwards;
 }
 
+.auth-header h1 {
+  color: #e2b714;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.auth-header p {
+  color: #646669;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
 .back-link {
   display: inline-flex;
   align-items: center;
-  color: #8b5a2b;
+  color: #646669;
   text-decoration: none;
   font-weight: 400;
   margin-bottom: 1.5rem;
@@ -85,15 +99,15 @@
   transform: translateX(-10px) rotateZ(-5deg);
   animation: slideInLeftRotate 0.5s ease-out 0.4s forwards;
   padding: 0.5rem 0.75rem;
-  border-radius: 1px;
+  border-radius: 4px;
   border: 1px solid transparent;
 }
 
 .back-link:hover {
-  color: #ff6347;
+  color: #e2b714;
   transform: translateX(5px) rotateZ(2deg) scale(1.05);
-  background: rgba(255, 99, 71, 0.05);
-  border-color: rgba(255, 99, 71, 0.1);
+  background: rgba(226, 183, 20, 0.1);
+  border-color: rgba(226, 183, 20, 0.2);
 }
 
 .auth-header h1 {
@@ -144,56 +158,58 @@
 
 .form-group label {
   display: block;
-  color: #8b5a2b;
+  color: #d1d0c5;
   font-weight: 500;
   margin-bottom: 0.5rem;
   font-size: 0.95rem;
+  font-family: 'Roboto Mono', monospace;
 }
 
 .form-input {
   width: 100%;
   padding: 1rem;
-  border: 1px solid rgba(139, 90, 43, 0.3);
+  border: 2px solid #525252;
   font-size: 1rem;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  background: rgba(255, 255, 255, 0.85);
-  color: #2a2a2a;
-  font-family: inherit;
+  background: #323437;
+  color: #d1d0c5;
+  font-family: 'Roboto Mono', monospace;
   transform-origin: center;
-  backdrop-filter: blur(3px);
+  border-radius: 4px;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: rgba(255, 99, 71, 0.6);
+  border-color: #e2b714;
   box-shadow: 
-    0 0 0 2px rgba(255, 99, 71, 0.15),
-    0 4px 12px rgba(255, 99, 71, 0.1);
+    0 0 0 2px rgba(226, 183, 20, 0.3),
+    0 4px 12px rgba(226, 183, 20, 0.2);
   transform: scale(1.02) rotateX(2deg);
-  background: rgba(255, 255, 255, 0.95);
+  background: #2c2e31;
 }
 
 .form-input:hover {
   transform: translateY(-1px) rotateX(1deg);
-  border-color: rgba(255, 99, 71, 0.4);
-  box-shadow: 0 2px 8px rgba(255, 99, 71, 0.08);
+  border-color: #e2b714;
+  box-shadow: 0 2px 8px rgba(226, 183, 20, 0.1);
 }
 
 .form-input.error {
-  border-color: #dc3545;
+  border-color: #ca4754;
 }
 
 .form-input::placeholder {
-  color: rgba(139, 90, 43, 0.6);
+  color: #646669;
   font-style: italic;
 }
 
 .error-message {
-  color: #dc3545;
+  color: #ca4754;
   font-size: 0.875rem;
   margin-top: 0.25rem;
   display: block;
   font-weight: 400;
+  font-family: 'Roboto Mono', monospace;
 }
 
 /* Password Strength */
@@ -297,15 +313,16 @@
 }
 
 .forgot-link {
-  color: rgba(139, 90, 43, 0.8);
+  color: #646669;
   text-decoration: none;
   font-size: 0.95rem;
   font-weight: 400;
   transition: color 0.2s ease;
+  font-family: 'Roboto Mono', monospace;
 }
 
 .forgot-link:hover {
-  color: #ff6347;
+  color: #e2b714;
 }
 
 /* Buttons */
@@ -326,19 +343,22 @@
 
 .btn-primary-full {
   width: 100%;
-  background: linear-gradient(135deg, #ff6347 0%, #e5533d 100%);
-  color: #ffffff;
-  border: 1px solid #ff6347;
+  background: #e2b714;
+  color: #323437;
+  border: 2px solid #e2b714;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
-  box-shadow: 0 2px 8px rgba(255, 99, 71, 0.25);
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 600;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(226, 183, 20, 0.3);
 }
 
 .btn-primary-full:hover:not(:disabled) {
-  background: linear-gradient(135deg, #e5533d 0%, #d14836 100%);
+  background: #d1a513;
   transform: translateY(-3px) rotateX(5deg) scale(1.02);
-  box-shadow: 0 12px 35px rgba(255, 99, 71, 0.4);
-  border-color: #e5533d;
+  box-shadow: 0 12px 35px rgba(226, 183, 20, 0.4);
+  border-color: #d1a513;
 }
 
 .btn-primary-full:disabled {
@@ -372,15 +392,16 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: rgba(139, 90, 43, 0.2);
+  background: #525252;
 }
 
 .divider span {
-  background: #faf7f4;
+  background: #2c2e31;
   padding: 0 1rem;
-  color: rgba(139, 90, 43, 0.8);
+  color: #646669;
   font-size: 0.95rem;
   font-weight: 400;
+  font-family: 'Roboto Mono', monospace;
 }
 
 .social-login {
@@ -391,21 +412,22 @@
 }
 
 .btn-social {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(139, 90, 43, 0.3);
-  color: rgba(139, 90, 43, 0.9);
+  background: #3c3e41;
+  border: 2px solid #525252;
+  color: #d1d0c5;
   font-weight: 400;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
-  backdrop-filter: blur(3px);
+  font-family: 'Roboto Mono', monospace;
+  border-radius: 4px;
 }
 
 .btn-social:hover {
-  border-color: rgba(255, 99, 71, 0.5);
-  background: rgba(255, 255, 255, 0.95);
-  color: #ff6347;
+  border-color: #e2b714;
+  background: #2c2e31;
+  color: #e2b714;
   transform: translateY(-2px) rotateY(3deg) scale(1.02);
-  box-shadow: 0 6px 20px rgba(255, 99, 71, 0.15);
+  box-shadow: 0 6px 20px rgba(226, 183, 20, 0.2);
 }
 
 .social-icon {
@@ -417,24 +439,25 @@
 .auth-footer {
   text-align: center;
   padding-top: 1.5rem;
-  border-top: 1px solid rgba(139, 90, 43, 0.2);
+  border-top: 1px solid #525252;
 }
 
 .auth-footer p {
-  color: rgba(139, 90, 43, 0.8);
+  color: #646669;
   font-size: 0.95rem;
   font-weight: 400;
+  font-family: 'Roboto Mono', monospace;
 }
 
 .auth-link {
-  color: rgba(139, 90, 43, 0.9);
+  color: #d1d0c5;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
 }
 
 .auth-link:hover {
-  color: #ff6347;
+  color: #e2b714;
 }
 
 .link {

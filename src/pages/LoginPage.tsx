@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import MagnetLines from '../components/MagnetLines';
 import '../styles/Auth.css';
 
 const LoginPage: React.FC = () => {
@@ -71,25 +70,6 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="auth-container">
-      <MagnetLines
-        rows={1000}
-        columns={1000}
-        containerSize="100vmax"
-        lineColor="black"
-        lineWidth="0.05vmin"
-        lineHeight="2vmin"
-        baseAngle={0}
-        className="magnetLines-auth"
-        style={{ 
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          margin: 0,
-          zIndex: 0
-        }}
-      />
       <div className="auth-wrapper">
         <div className="auth-card">
           <div className="auth-header">

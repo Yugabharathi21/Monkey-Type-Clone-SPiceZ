@@ -1,61 +1,316 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import NavBar from '../components/NavBar';
 import '../styles/Dashboard.css';
 
+interface TypingSession {
+  id: string;
+  date: string;
+  wpm: number;
+  accuracy: number;
+  duration: number;
+  charactersTyped: number;
+  errorCount: number;
+  textLength: number;
+}
+
+interface DashboardStats {
+  totalTests: number;
+  averageWpm: number;
+  averageAccuracy: number;
+  totalTimeTyping: number;
+  bestWpm: number;
+  bestAccuracy: number;
+  totalCharacters: number;
+  improvementRate: number;
+}
+
 const Dashboard: React.FC = () => {
+  const [sessions, setSessions] = useState<TypingSession[]>([]);
+  const [stats, setStats] = useState<DashboardStats>({
+    totalTests: 0,
+    averageWpm: 0,
+    averageAccuracy: 0,
+    totalTimeTyping: 0,
+    bestWpm: 0,
+    bestAccuracy: 0,
+    totalCharacters: 0,
+    improvementRate: 0
+  });
+  const [timeRange, setTimeRange] = useState<'week' | 'month' | 'all'>('week');
+
+  useEffect(() => {
+    // Mock session data - in a real app, this would come from an API
+    const mockSessions: TypingSession[] = [
+      {
+        id: '1',
+        date: '2025-01-19T14:30:00Z',
+        wpm: 85,
+        accuracy: 94,
+        duration: 60,
+        charactersTyped: 425,
+        errorCount: 26,
+        textLength: 451
+      },
+      {
+        id: '2',
+        date: '2025-01-19T09:15:00Z',
+        wpm: 78,
+        accuracy: 91,
+        duration: 90,
+        charactersTyped: 585,
+        errorCount: 58,
+        textLength: 643
+      },
+      {
+        id: '3',
+        date: '2025-01-18T16:45:00Z',
+        wpm: 82,
+        accuracy: 96,
+        duration: 75,
+        charactersTyped: 513,
+        errorCount: 21,
+        textLength: 534
+      },
+      {
+        id: '4',
+        date: '2025-01-18T11:20:00Z',
+        wpm: 73,
+        accuracy: 89,
+        duration: 60,
+        charactersTyped: 365,
+        errorCount: 45,
+        textLength: 410
+      },
+      {
+        id: '5',
+        date: '2025-01-17T19:30:00Z',
+        wpm: 80,
+        accuracy: 93,
+        duration: 120,
+        charactersTyped: 800,
+        errorCount: 60,
+        textLength: 860
+      },
+      {
+        id: '6',
+        date: '2025-01-17T13:10:00Z',
+        wpm: 76,
+        accuracy: 87,
+        duration: 60,
+        charactersTyped: 380,
+        errorCount: 59,
+        textLength: 439
+      },
+      {
+        id: '7',
+        date: '2025-01-16T20:45:00Z',
+        wpm: 71,
+        accuracy: 92,
+        duration: 90,
+        charactersTyped: 533,
+        errorCount: 46,
+        textLength: 579
+      },
+      {
+        id: '8',
+        date: '2025-01-16T15:25:00Z',
+        wpm: 68,
+        accuracy: 85,
+        duration: 60,
+        charactersTyped: 340,
+        errorCount: 64,
+        textLength: 404
+      }
+    ];
+
+    // Filter sessions based on time range
+    const now = new Date();
+    const filteredSessions = mockSessions.filter(session => {
+      const sessionDate = new Date(session.date);
+      if (timeRange === 'week') {
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return sessionDate >= weekAgo;
+      } else if (timeRange === 'month') {
+        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        return sessionDate >= monthAgo;
+      }
+      return true;
+    });
+
+    setSessions(filteredSessions);
+
+    // Calculate stats
+    if (filteredSessions.length > 0) {
+      const totalTests = filteredSessions.length;
+      const totalWpm = filteredSessions.reduce((sum, s) => sum + s.wpm, 0);
+      const totalAccuracy = filteredSessions.reduce((sum, s) => sum + s.accuracy, 0);
+      const totalTime = filteredSessions.reduce((sum, s) => sum + s.duration, 0);
+      const totalChars = filteredSessions.reduce((sum, s) => sum + s.charactersTyped, 0);
+      const bestWpm = Math.max(...filteredSessions.map(s => s.wpm));
+      const bestAccuracy = Math.max(...filteredSessions.map(s => s.accuracy));
+
+      // Calculate improvement rate (comparing first half vs second half)
+      const midPoint = Math.floor(filteredSessions.length / 2);
+      const firstHalf = filteredSessions.slice(0, midPoint);
+      const secondHalf = filteredSessions.slice(midPoint);
+      
+      let improvementRate = 0;
+      if (firstHalf.length > 0 && secondHalf.length > 0) {
+        const firstHalfAvg = firstHalf.reduce((sum, s) => sum + s.wpm, 0) / firstHalf.length;
+        const secondHalfAvg = secondHalf.reduce((sum, s) => sum + s.wpm, 0) / secondHalf.length;
+        improvementRate = ((secondHalfAvg - firstHalfAvg) / firstHalfAvg) * 100;
+      }
+
+      setStats({
+        totalTests,
+        averageWpm: Math.round(totalWpm / totalTests),
+        averageAccuracy: Math.round(totalAccuracy / totalTests),
+        totalTimeTyping: totalTime,
+        bestWpm,
+        bestAccuracy,
+        totalCharacters: totalChars,
+        improvementRate: Math.round(improvementRate)
+      });
+    }
+  }, [timeRange]);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const formatDuration = (seconds: number) => {
+    if (seconds < 60) return `${seconds}s`;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}m ${remainingSeconds}s`;
+  };
+
   return (
-    <div className="dashboard">
-      <nav className="dashboard-nav">
-        <div className="nav-container">
-          <h2>ModernApp Dashboard</h2>
-          <div className="nav-menu">
-            <Link to="/" className="nav-link">
-              Home
-            </Link>
-            <button className="btn btn-outline">
-              Logout
-            </button>
-          </div>
-        </div>
-      </nav>
+    <div className="dashboard-container">
+      <NavBar />
 
       <main className="dashboard-main">
-        <div className="dashboard-container">
-          <div className="welcome-section">
-            <h1>Welcome to your Dashboard! 🎉</h1>
-            <p>You have successfully logged in to ModernApp.</p>
+        <div className="analytics-title">
+          <h2>Your Typing Analytics</h2>
+          <p>Track your progress and improve your typing skills</p>
+        </div>
+
+        <div className="time-filter">
+          <button 
+            className={`filter-btn ${timeRange === 'week' ? 'active' : ''}`}
+            onClick={() => setTimeRange('week')}
+          >
+            Last Week
+          </button>
+          <button 
+            className={`filter-btn ${timeRange === 'month' ? 'active' : ''}`}
+            onClick={() => setTimeRange('month')}
+          >
+            Last Month
+          </button>
+          <button 
+            className={`filter-btn ${timeRange === 'all' ? 'active' : ''}`}
+            onClick={() => setTimeRange('all')}
+          >
+            All Time
+          </button>
+        </div>
+
+        <div className="stats-grid">
+          <div className="stat-card primary">
+            <div className="stat-icon">⚡</div>
+            <div className="stat-content">
+              <h3>Average WPM</h3>
+              <div className="stat-value">{stats.averageWpm}</div>
+              <div className="stat-change positive">
+                +{stats.improvementRate}% improvement
+              </div>
+            </div>
           </div>
 
-          <div className="dashboard-grid">
-            <div className="dashboard-card">
-              <div className="card-icon">📊</div>
-              <h3>Analytics</h3>
-              <p>View your performance metrics and insights</p>
-              <button className="btn btn-primary">View Analytics</button>
+          <div className="stat-card">
+            <div className="stat-icon">🎯</div>
+            <div className="stat-content">
+              <h3>Average Accuracy</h3>
+              <div className="stat-value">{stats.averageAccuracy}%</div>
+              <div className="stat-label">precision matters</div>
             </div>
+          </div>
 
-            <div className="dashboard-card">
-              <div className="card-icon">⚙️</div>
-              <h3>Settings</h3>
-              <p>Manage your account and preferences</p>
-              <button className="btn btn-primary">Open Settings</button>
+          <div className="stat-card">
+            <div className="stat-icon">🏆</div>
+            <div className="stat-content">
+              <h3>Best WPM</h3>
+              <div className="stat-value">{stats.bestWpm}</div>
+              <div className="stat-label">personal record</div>
             </div>
+          </div>
 
-            <div className="dashboard-card">
-              <div className="card-icon">👥</div>
-              <h3>Team</h3>
-              <p>Collaborate with your team members</p>
-              <button className="btn btn-primary">Manage Team</button>
+          <div className="stat-card">
+            <div className="stat-icon">📊</div>
+            <div className="stat-content">
+              <h3>Tests Completed</h3>
+              <div className="stat-value">{stats.totalTests}</div>
+              <div className="stat-label">keep practicing</div>
             </div>
+          </div>
 
-            <div className="dashboard-card">
-              <div className="card-icon">📋</div>
-              <h3>Projects</h3>
-              <p>Access and manage your projects</p>
-              <button className="btn btn-primary">View Projects</button>
+          <div className="stat-card">
+            <div className="stat-icon">⏱️</div>
+            <div className="stat-content">
+              <h3>Time Spent</h3>
+              <div className="stat-value">{formatDuration(stats.totalTimeTyping)}</div>
+              <div className="stat-label">dedicated practice</div>
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon">🔤</div>
+            <div className="stat-content">
+              <h3>Characters Typed</h3>
+              <div className="stat-value">{stats.totalCharacters.toLocaleString()}</div>
+              <div className="stat-label">keystrokes logged</div>
             </div>
           </div>
         </div>
+
+        <div className="recent-sessions">
+          <h3>Recent Sessions</h3>
+          <div className="sessions-table">
+            <div className="table-header">
+              <div>Date</div>
+              <div>WPM</div>
+              <div>Accuracy</div>
+              <div>Duration</div>
+              <div>Characters</div>
+            </div>
+            <div className="table-body">
+              {sessions.slice(0, 10).map(session => (
+                <div key={session.id} className="table-row">
+                  <div className="session-date">{formatDate(session.date)}</div>
+                  <div className="session-wpm">{session.wpm}</div>
+                  <div className="session-accuracy">{session.accuracy}%</div>
+                  <div className="session-duration">{formatDuration(session.duration)}</div>
+                  <div className="session-characters">{session.charactersTyped}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {sessions.length === 0 && (
+          <div className="no-data">
+            <h3>No typing sessions found</h3>
+            <p>Start typing to see your analytics!</p>
+            <Link to="/" className="start-typing-btn">Start Typing Test</Link>
+          </div>
+        )}
       </main>
     </div>
   );

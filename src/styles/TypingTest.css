@@ -1,0 +1,283 @@
+/* Type Monkey Inspired Typing Test Styles */
+.typing-container {
+  min-height: 100vh;
+  background: #323437;
+  color: #d1d0c5;
+  font-family: 'Roboto Mono', 'Fira Code', 'Consolas', monospace;
+  display: flex;
+  flex-direction: column;
+}
+
+.typing-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.stats-bar {
+  display: flex;
+  gap: 3rem;
+  margin-bottom: 3rem;
+  padding: 1rem 2rem;
+  background: #2c2e31;
+  border-radius: 8px;
+  border: 1px solid #525252;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #646669;
+  text-transform: lowercase;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #e2b714;
+}
+
+.text-display {
+  background: #2c2e31;
+  border: 2px solid #525252;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  font-size: 1.2rem;
+  line-height: 1.8;
+  max-width: 100%;
+  min-height: 200px;
+  overflow-wrap: break-word;
+  position: relative;
+  outline: none;
+  cursor: text;
+}
+
+.text-display:focus {
+  border-color: #e2b714;
+  box-shadow: 0 0 0 3px rgba(226, 183, 20, 0.2);
+}
+
+.start-prompt {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #646669;
+  font-size: 0.9rem;
+  font-style: italic;
+  opacity: 0.7;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.char {
+  position: relative;
+}
+
+.char.correct {
+  color: #d1d0c5;
+  background: rgba(226, 183, 20, 0.1);
+}
+
+.char.incorrect {
+  color: #ca4754;
+  background: rgba(202, 71, 84, 0.2);
+}
+
+.char.current {
+  background: #e2b714;
+  color: #323437;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.3; }
+}
+
+/* Remove the typing input styles since we no longer use a separate input */
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.control-btn {
+  background: #3c3e41;
+  border: 2px solid #525252;
+  color: #d1d0c5;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  border-color: #e2b714;
+  color: #e2b714;
+  background: #2c2e31;
+  transform: translateY(-2px);
+}
+
+.results {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(50, 52, 55, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.results h2 {
+  color: #e2b714;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-bottom: 3rem;
+  max-width: 500px;
+}
+
+.result-item {
+  background: #2c2e31;
+  border: 1px solid #525252;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.result-label {
+  display: block;
+  color: #646669;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  text-transform: lowercase;
+}
+
+.result-value {
+  display: block;
+  color: #e2b714;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.retry-btn {
+  background: #e2b714;
+  color: #323437;
+  border: 2px solid #e2b714;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.retry-btn:hover {
+  background: #d1a513;
+  border-color: #d1a513;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(226, 183, 20, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .typing-header {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .typing-main {
+    padding: 1rem;
+  }
+
+  .stats-bar {
+    gap: 1.5rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .text-display {
+    padding: 1.5rem;
+    font-size: 1.1rem;
+    min-height: 150px;
+  }
+
+  .results-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .controls {
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .control-btn {
+    width: 100%;
+  }
+}
+
+/* Focus states for accessibility */
+.control-btn:focus,
+.retry-btn:focus,
+.nav-link:focus {
+  outline: 2px solid #e2b714;
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar */
+.typing-input::-webkit-scrollbar {
+  width: 8px;
+}
+
+.typing-input::-webkit-scrollbar-track {
+  background: #323437;
+}
+
+.typing-input::-webkit-scrollbar-thumb {
+  background: #525252;
+  border-radius: 4px;
+}
+
+.typing-input::-webkit-scrollbar-thumb:hover {
+  background: #646669;
+}
