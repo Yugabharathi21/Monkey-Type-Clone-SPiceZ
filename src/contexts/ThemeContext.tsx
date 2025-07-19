@@ -114,22 +114,6 @@ export const themes: Record<string, Theme> = {
       error: '#f87171'
     }
   },
-  mordern: {
-    name: 'Mordern',
-    colors: {
-      primary: '#0f172a',
-      accent: '#6366f1',
-      accentRgb: '99, 102, 241',
-      background: '#ffffff',
-      backgroundSecondary: '#f8fafc',
-      cardBackground: '#f1f5f9',
-      textPrimary: '#0f172a',
-      textSecondary: '#475569',
-      borderColor: '#e2e8f0',
-      success: '#22c55e',
-      error: '#ef4444'
-    }
-  },
   discord: {
     name: 'Discord Dark',
     colors: {

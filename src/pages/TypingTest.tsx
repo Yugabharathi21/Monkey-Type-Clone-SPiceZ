@@ -237,6 +237,7 @@ const TypingTest: React.FC = () => {
         {isCompleted && (
           <div className="results">
             <h2>Test Complete!</h2>
+            
             <div className="results-grid">
               <div className="result-item">
                 <span className="result-label">Words per minute</span>
