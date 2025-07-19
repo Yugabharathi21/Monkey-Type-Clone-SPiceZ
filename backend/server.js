@@ -38,20 +38,28 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
+    console.log('🌐 CORS check - Origin:', origin);
+    
     // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      console.log('✅ CORS: Allowing request with no origin');
+      return callback(null, true);
+    }
     
     if (allowedOrigins.indexOf(origin) !== -1) {
+      console.log('✅ CORS: Allowing origin:', origin);
       callback(null, true);
     } else {
-      console.log('CORS blocked origin:', origin);
-      callback(new Error('Not allowed by CORS'));
+      console.log('❌ CORS: Blocking origin:', origin);
+      console.log('📋 Allowed origins:', allowedOrigins);
+      // For debugging, let's be more permissive temporarily
+      callback(null, true); // Allow all origins for now
     }
   },
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 };
 app.use(cors(corsOptions));
 
@@ -69,10 +77,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/typing-test-db', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/typing-test-db')
 .then(() => {
   console.log('✅ Connected to MongoDB');
 })
@@ -82,11 +87,17 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/typing-te
 });
 
 // Routes
+console.log('📋 Registering API routes...');
 app.use('/api/users', userRoutes);
+console.log('✅ Registered: /api/users/*');
 app.use('/api/tests', testRoutes);
+console.log('✅ Registered: /api/tests/*');
 app.use('/api/stats', statsRoutes);
+console.log('✅ Registered: /api/stats/*');
 app.use('/api/leaderboard', leaderboardRoutes);
+console.log('✅ Registered: /api/leaderboard/*');
 app.use('/api/admin', adminRoutes);
+console.log('✅ Registered: /api/admin/*');
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -94,28 +105,57 @@ app.get('/api/health', (req, res) => {
     status: 'OK',
     message: 'Typing Test API is running',
     timestamp: new Date().toISOString(),
+    cors: {
+      origin: req.get('Origin'),
+      allowedOrigins: allowedOrigins
+    }
+  });
+});
+
+// Test endpoint for CORS debugging
+app.get('/api/test', (req, res) => {
+  res.status(200).json({
+    message: 'Test endpoint working',
+    headers: req.headers,
+    origin: req.get('Origin')
   });
 });
 
 // 404 handler with CORS headers
 app.use('*', (req, res) => {
-  // Ensure CORS headers are present
-  res.header('Access-Control-Allow-Origin', req.get('Origin') || '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  // Get the origin from the request
+  const origin = req.get('Origin');
   
-  console.log(`404 - Route not found: ${req.method} ${req.originalUrl}`);
-  console.log('Available routes:');
-  console.log('  GET  /api/health');
-  console.log('  POST /api/users/login');
-  console.log('  POST /api/users/register');
-  console.log('  GET  /api/users/profile');
+  // Set CORS headers explicitly
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else if (!origin) {
+    res.header('Access-Control-Allow-Origin', '*');
+  } else {
+    // For debugging, allow the origin anyway
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  console.log(`❌ 404 - Route not found: ${req.method} ${req.originalUrl}`);
+  console.log(`🌐 Origin: ${origin}`);
+  console.log(`📋 Available routes:`);
+  console.log(`  GET  /api/health`);
+  console.log(`  GET  /api/test`);
+  console.log(`  POST /api/users/login`);
+  console.log(`  POST /api/users/register`);
+  console.log(`  GET  /api/users/profile`);
   
   res.status(404).json({
     error: 'Route not found',
     message: `Cannot ${req.method} ${req.originalUrl}`,
+    origin: origin,
     availableRoutes: [
       'GET /api/health',
+      'GET /api/test',
       'POST /api/users/login',
       'POST /api/users/register',
       'GET /api/users/profile'

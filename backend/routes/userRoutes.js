@@ -5,6 +5,12 @@ const { auth } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Add logging middleware for debugging
+router.use((req, res, next) => {
+  console.log(`📨 User route: ${req.method} ${req.path} - Body:`, Object.keys(req.body || {}));
+  next();
+});
+
 // Register user
 router.post('/register', async (req, res) => {
   try {
@@ -59,6 +65,8 @@ router.post('/register', async (req, res) => {
 
 // Login user
 router.post('/login', async (req, res) => {
+  console.log('🔐 Login attempt received:', req.body.login || 'no login provided');
+  
   try {
     const { login, password } = req.body; // login can be username or email
 

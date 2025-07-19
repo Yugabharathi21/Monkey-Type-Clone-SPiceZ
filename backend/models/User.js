@@ -136,9 +136,9 @@ const userSchema = new mongoose.Schema({
   toObject: { virtuals: true },
 });
 
-// Indexes for better performance
-userSchema.index({ username: 1 });
-userSchema.index({ email: 1 });
+// Indexes for better performance (username and email already have unique indexes)
+// userSchema.index({ username: 1 }); // Removed - already indexed by unique: true
+// userSchema.index({ email: 1 });    // Removed - already indexed by unique: true
 userSchema.index({ 'stats.bestWPM': -1 });
 userSchema.index({ createdAt: -1 });
 
