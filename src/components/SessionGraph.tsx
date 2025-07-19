@@ -23,6 +23,11 @@ const SessionGraph: React.FC<SessionGraphProps> = ({
   const displayWpmHistory = wpmHistory.slice(-maxDataPoints);
   const displayAccuracyHistory = accuracyHistory.slice(-maxDataPoints);
 
+  // Calculate additional statistics
+  const avgWpm = wpmHistory.length > 0 ? Math.round(wpmHistory.reduce((a, b) => a + b, 0) / wpmHistory.length) : 0;
+  const maxWpmReached = wpmHistory.length > 0 ? Math.max(...wpmHistory) : 0;
+  const avgAccuracy = accuracyHistory.length > 0 ? Math.round(accuracyHistory.reduce((a, b) => a + b, 0) / accuracyHistory.length) : 0;
+
   return (
     <div className={`session-graph ${isActive ? 'active' : ''}`}>
       <div className="graph-header">
@@ -30,6 +35,22 @@ const SessionGraph: React.FC<SessionGraphProps> = ({
         <div className="current-stats">
           <span className="current-wpm">{currentWpm} WPM</span>
           <span className="current-accuracy">{currentAccuracy}%</span>
+        </div>
+      </div>
+
+      {/* Performance Summary */}
+      <div className="performance-summary">
+        <div className="summary-item">
+          <span className="summary-label">Avg WPM</span>
+          <span className="summary-value">{avgWpm}</span>
+        </div>
+        <div className="summary-item">
+          <span className="summary-label">Peak WPM</span>
+          <span className="summary-value">{maxWpmReached}</span>
+        </div>
+        <div className="summary-item">
+          <span className="summary-label">Avg Accuracy</span>
+          <span className="summary-value">{avgAccuracy}%</span>
         </div>
       </div>
       

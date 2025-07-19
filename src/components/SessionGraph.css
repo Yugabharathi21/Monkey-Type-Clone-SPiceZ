@@ -46,6 +46,36 @@
   font-size: 0.9rem;
 }
 
+.performance-summary {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: rgba(var(--accent-rgb), 0.05);
+  border-radius: 6px;
+  border-left: 3px solid var(--accent);
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.summary-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
 .graph-container {
   height: 120px;
   position: relative;

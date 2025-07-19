@@ -187,6 +187,20 @@
   max-width: 500px;
 }
 
+.results-graph-section {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 3rem;
+}
+
+.results-graph-section h3 {
+  color: var(--accent);
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: 600;
+}
+
 .result-item {
   background: var(--background-secondary);
   border: 1px solid var(--border-color);

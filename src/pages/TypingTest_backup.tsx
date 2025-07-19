@@ -13,9 +13,10 @@ interface TypingStats {
 }
 
 const sampleTexts = [
-  "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the alphabet.",
-  "Programming is not about typing, it's about thinking. Speed comes with practice and understanding.",
-  "Type like the wind, think like the storm. Every keystroke brings you closer to mastery."
+  "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the alphabet at least once, making it perfect for typing practice.",
+  "In the digital age, typing skills have become essential. Whether you're coding, writing emails, or creating documents, speed and accuracy matter.",
+  "Programming requires patience, logic, and attention to detail. Every semicolon, bracket, and variable name must be precisely typed to avoid errors.",
+  "The art of touch typing transforms the keyboard into an extension of your thoughts, allowing ideas to flow seamlessly from mind to screen."
 ];
 
 const TypingTest: React.FC = () => {
@@ -78,31 +79,6 @@ const TypingTest: React.FC = () => {
     }
   }, [startTime, currentText]);
 
-  const calculateFinalStats = React.useCallback(() => {
-    if (!startTime) return;
-    
-    const timeElapsed = (Date.now() - startTime) / 1000 / 60;
-    let correctCharacters = 0;
-
-    for (let i = 0; i < userInput.length; i++) {
-      if (userInput[i] === currentText[i]) {
-        correctCharacters++;
-      }
-    }
-
-    const accuracy = userInput.length > 0 ? (correctCharacters / userInput.length) * 100 : 0;
-    const wpm = timeElapsed > 0 ? Math.round((correctCharacters / 5) / timeElapsed) : 0;
-    
-    setStats({
-      wpm,
-      accuracy: Math.round(accuracy),
-      timeElapsed: Math.round((Date.now() - startTime) / 1000),
-      totalCharacters: userInput.length,
-      correctCharacters,
-      incorrectCharacters: userInput.length - correctCharacters
-    });
-  }, [userInput, currentText, startTime]);
-
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       // Prevent default for most keys except special ones
@@ -113,6 +89,8 @@ const TypingTest: React.FC = () => {
       if (!isStarted && e.key.length === 1) {
         handleStart();
       }
+
+      if (isCompleted) return;
 
       if (e.key === 'Backspace') {
         if (userInput.length > 0) {
@@ -136,13 +114,77 @@ const TypingTest: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [userInput, currentText, isStarted, isCompleted, calculateStats, handleStart]);
 
-  // Check if test is completed
+  const calculateFinalStats = React.useCallback(() => {
+    if (!startTime) return;
+    
+    const timeElapsed = (Date.now() - startTime) / 1000 / 60;
+    let correctCharacters = 0;
+
+    for (let i = 0; i < currentText.length; i++) {
+      if (userInput[i] === currentText[i]) {
+        correctCharacters++;
+      }
+    }
+
+    const accuracy = (correctCharacters / currentText.length) * 100;
+    const wpm = Math.round((correctCharacters / 5) / timeElapsed);
+
+    setStats(prev => ({
+      ...prev,
+      wpm,
+      accuracy: Math.round(accuracy),
+      timeElapsed: Math.round(timeElapsed * 60)
+    }));
+  }, [startTime, currentText, userInput]);
+
   useEffect(() => {
     if (userInput.length === currentText.length && userInput.length > 0) {
       setIsCompleted(true);
       calculateFinalStats();
     }
   }, [userInput, currentText, calculateFinalStats]);
+
+  const handleStart = React.useCallback(() => {
+    if (!isStarted) {
+      setIsStarted(true);
+      setStartTime(Date.now());
+    }
+  }, [isStarted]);
+
+  const calculateStats = React.useCallback((input: string) => {
+    if (!startTime) return;
+
+    const timeElapsed = (Date.now() - startTime) / 1000 / 60; // in minutes
+    const totalCharacters = input.length;
+    let correctCharacters = 0;
+
+    for (let i = 0; i < input.length; i++) {
+      if (input[i] === currentText[i]) {
+        correctCharacters++;
+      }
+    }
+
+    const incorrectCharacters = totalCharacters - correctCharacters;
+    const accuracy = totalCharacters > 0 ? (correctCharacters / totalCharacters) * 100 : 0;
+    const wpm = timeElapsed > 0 ? Math.round((correctCharacters / 5) / timeElapsed) : 0;
+
+    const newStats = {
+      wpm,
+      accuracy: Math.round(accuracy),
+      timeElapsed: Math.round(timeElapsed * 60), // back to seconds for display
+      totalCharacters,
+      correctCharacters,
+      incorrectCharacters
+    };
+
+    setStats(newStats);
+
+    // Update history every few characters for smooth graph updates
+    if (totalCharacters > 0 && totalCharacters % 5 === 0) {
+      setWpmHistory(prev => [...prev, wpm]);
+      setAccuracyHistory(prev => [...prev, Math.round(accuracy)]);
+    }
+  }, [startTime, currentText]);
 
   const resetTest = () => {
     setUserInput('');
@@ -160,37 +202,36 @@ const TypingTest: React.FC = () => {
       correctCharacters: 0,
       incorrectCharacters: 0
     });
-    // Generate new text
+  };
+
+  const changeText = () => {
     const randomIndex = Math.floor(Math.random() * sampleTexts.length);
     setCurrentText(sampleTexts[randomIndex]);
+    resetTest();
   };
 
   const renderText = () => {
-    return (
-      <div className="text-content">
-        {currentText.split('').map((char, index) => {
-          let className = 'char';
-          
-          if (index < userInput.length) {
-            className += userInput[index] === char ? ' correct' : ' incorrect';
-          } else if (index === currentIndex) {
-            className += ' current';
-          }
-          
-          return (
-            <span key={index} className={className}>
-              {char}
-            </span>
-          );
-        })}
-      </div>
-    );
+    return currentText.split('').map((char, index) => {
+      let className = 'char';
+      
+      if (index < userInput.length) {
+        className += userInput[index] === char ? ' correct' : ' incorrect';
+      } else if (index === currentIndex) {
+        className += ' current';
+      }
+
+      return (
+        <span key={index} className={className}>
+          {char}
+        </span>
+      );
+    });
   };
 
   return (
     <div className="typing-container">
       <NavBar />
-      
+
       <main className="typing-main">
         <div className="stats-bar">
           <div className="stat">
@@ -231,6 +272,9 @@ const TypingTest: React.FC = () => {
         <div className="controls">
           <button onClick={resetTest} className="control-btn">
             reset
+          </button>
+          <button onClick={changeText} className="control-btn">
+            new text
           </button>
         </div>
 
