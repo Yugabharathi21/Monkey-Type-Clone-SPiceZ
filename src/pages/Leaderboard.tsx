@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import NavBar from '../components/NavBar';
 import '../styles/Leaderboard.css';
 
 interface LeaderboardEntry {
@@ -161,8 +160,6 @@ const Leaderboard: React.FC = () => {
 
   return (
     <div className="leaderboard-container">
-      <NavBar />
-
       <main className="leaderboard-main">
         <div className="leaderboard-title">
           <h2>Global Leaderboard</h2>

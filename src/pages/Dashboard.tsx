@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import NavBar from '../components/NavBar';
 import ThemeSelector from '../components/ThemeSelector';
 import '../styles/Dashboard.css';
 
@@ -207,8 +206,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="dashboard-container">
-      <NavBar />
-
       <main className="dashboard-main">
         <div className="analytics-title">
           <h2>Your Typing Analytics</h2>

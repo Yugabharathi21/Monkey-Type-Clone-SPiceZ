@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import NavBar from '../components/NavBar';
 import SessionGraph from '../components/SessionGraph';
 import '../styles/TypingTest.css';
 
@@ -189,8 +188,6 @@ const TypingTest: React.FC = () => {
 
   return (
     <div className="typing-container">
-      <NavBar />
-      
       <main className="typing-main">
         <div className="stats-bar">
           <div className="stat">

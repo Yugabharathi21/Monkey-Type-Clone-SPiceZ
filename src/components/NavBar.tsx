@@ -4,13 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import LoginModal from './LoginModal';
 import './NavBar.css';
 
-interface NavBarProps {
-  currentTheme: string;
-  onThemeChange: (theme: string) => void;
-  themes: Array<{ name: string; displayName: string }>;
-}
-
-const NavBar: React.FC<NavBarProps> = ({ currentTheme, onThemeChange, themes }) => {
+const NavBar: React.FC = () => {
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -55,19 +49,6 @@ const NavBar: React.FC<NavBarProps> = ({ currentTheme, onThemeChange, themes }) 
             >
               leaderboard
             </Link>
-            
-            {/* Theme Selector */}
-            <select 
-              value={currentTheme} 
-              onChange={(e) => onThemeChange(e.target.value)}
-              className="theme-selector"
-            >
-              {themes.map((theme) => (
-                <option key={theme.name} value={theme.name}>
-                  {theme.displayName}
-                </option>
-              ))}
-            </select>
             
             {/* Authentication Button */}
             {isAuthenticated ? (
