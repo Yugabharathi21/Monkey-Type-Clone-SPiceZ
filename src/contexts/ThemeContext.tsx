@@ -50,20 +50,36 @@ export const themes: Record<string, Theme> = {
       error: '#ef4444'
     }
   },
-  forest: {
-    name: 'Forest Green',
+  grooveForest: {
+    name: 'Groove Forest',
     colors: {
-      primary: '#14532d',
-      accent: '#22c55e',
-      accentRgb: '34, 197, 94',
-      background: '#1f2937',
-      backgroundSecondary: '#374151',
-      cardBackground: '#374151',
-      textPrimary: '#f9fafb',
-      textSecondary: '#9ca3af',
+      primary: '#064e3b',
+      accent: '#16a34a',
+      accentRgb: '22, 163, 74',
+      background: '#0f172a',
+      backgroundSecondary: '#1e293b',
+      cardBackground: '#1e3a3a',
+      textPrimary: '#e0f2f1',
+      textSecondary: '#80cbc4',
       borderColor: '#4b5563',
       success: '#10b981',
       error: '#ef4444'
+    }
+  },
+  oliveGreen: {
+    name: 'Olive Green',
+    colors: {
+      primary: '#556b2f',
+      accent: '#b5c58c',
+      accentRgb: '181, 197, 140',
+      background: '#f5f5dc',
+      backgroundSecondary: '#e0e0c0',
+      cardBackground: '#dcdcb5',
+      textPrimary: '#2e2e1f',
+      textSecondary: '#6b705c',
+      borderColor: '#9e9e7a',
+      success: '#6aa84f',
+      error: '#c0392b'
     }
   },
   sunset: {
@@ -82,20 +98,52 @@ export const themes: Record<string, Theme> = {
       error: '#dc2626'
     }
   },
-  purple: {
-    name: 'Royal Purple',
+  youngClam: {
+    name: 'Young Clam',
     colors: {
-      primary: '#581c87',
-      accent: '#a855f7',
-      accentRgb: '168, 85, 247',
-      background: '#1e1b4b',
-      backgroundSecondary: '#312e81',
-      cardBackground: '#312e81',
-      textPrimary: '#f8fafc',
-      textSecondary: '#a1a1aa',
-      borderColor: '#52525b',
-      success: '#10b981',
+      primary: '#94a3b8',
+      accent: '#f472b6',
+      accentRgb: '244, 114, 182',
+      background: '#f1f5f9',
+      backgroundSecondary: '#e2e8f0',
+      cardBackground: '#ffffff',
+      textPrimary: '#334155',
+      textSecondary: '#64748b',
+      borderColor: '#cbd5e1',
+      success: '#34d399',
+      error: '#f87171'
+    }
+  },
+  mordern: {
+    name: 'Mordern',
+    colors: {
+      primary: '#0f172a',
+      accent: '#6366f1',
+      accentRgb: '99, 102, 241',
+      background: '#ffffff',
+      backgroundSecondary: '#f8fafc',
+      cardBackground: '#f1f5f9',
+      textPrimary: '#0f172a',
+      textSecondary: '#475569',
+      borderColor: '#e2e8f0',
+      success: '#22c55e',
       error: '#ef4444'
+    }
+  },
+  discord: {
+    name: 'Discord Dark',
+    colors: {
+      primary: '#5865F2',
+      accent: '#7289DA',
+      accentRgb: '114, 137, 218',
+      background: '#2f3136',
+      backgroundSecondary: '#36393f',
+      cardBackground: '#40444b',
+      textPrimary: '#ffffff',
+      textSecondary: '#b9bbbe',
+      borderColor: '#4f545c',
+      success: '#43b581',
+      error: '#f04747'
     }
   }
 };
