@@ -48,6 +48,172 @@
   font-weight: 500;
 }
 
+/* Profile Management Section */
+.profile-management-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--background-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.profile-management-section h3 {
+  color: var(--accent);
+  font-size: 1.2rem;
+  margin: 0 0 1.5rem 0;
+  font-weight: 600;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.profile-card {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.profile-image-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--accent);
+  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.2);
+}
+
+.image-input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 200px;
+}
+
+.image-input-section label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.profile-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.profile-field {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-field label {
+  color: var(--text-secondary);
+  font-weight: 600;
+  min-width: 120px;
+  font-size: 0.95rem;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.profile-field span {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.profile-input {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease;
+  font-family: 'Roboto Mono', monospace;
+  background: var(--background);
+  color: var(--text-primary);
+}
+
+.profile-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.25);
+}
+
+.profile-input.invalid {
+  border-color: var(--error);
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.profile-input.invalid:focus {
+  border-color: var(--error);
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+}
+
+.profile-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.btn-edit {
+  background: var(--accent);
+  color: var(--background);
+}
+
+.btn-edit:hover {
+  background: var(--accent);
+  filter: brightness(0.9);
+}
+
+.btn-save {
+  background: var(--success);
+  color: var(--background);
+}
+
+.btn-save:hover {
+  background: var(--success);
+  filter: brightness(0.9);
+}
+
+.btn-cancel {
+  background: var(--text-secondary);
+  color: var(--background);
+}
+
+.btn-cancel:hover {
+  background: var(--text-secondary);
+  filter: brightness(0.9);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.btn:disabled:hover {
+  transform: none;
+  filter: none;
+}
+
 .time-filter {
   display: flex;
   justify-content: center;
@@ -635,6 +801,40 @@
 
   .filter-btn {
     width: 200px;
+  }
+  
+  /* Profile Management Responsive */
+  .profile-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  
+  .profile-image {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .image-input-section {
+    width: 100%;
+    max-width: 250px;
+  }
+  
+  .profile-field {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .profile-field label {
+    min-width: auto;
+    font-weight: 600;
+  }
+  
+  .profile-actions {
+    width: 100%;
+    justify-content: center;
   }
 }
 

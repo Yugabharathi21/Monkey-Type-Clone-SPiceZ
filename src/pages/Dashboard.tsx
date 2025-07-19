@@ -25,6 +25,13 @@ interface DashboardStats {
   improvementRate: number;
 }
 
+interface UserProfile {
+  name: string;
+  email: string;
+  profileImage: string;
+  joinDate: string;
+}
+
 const Dashboard: React.FC = () => {
   const [sessions, setSessions] = useState<TypingSession[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
@@ -38,154 +45,126 @@ const Dashboard: React.FC = () => {
     improvementRate: 0
   });
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'all'>('week');
+  const [profile, setProfile] = useState<UserProfile>({
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    profileImage: 'https://via.placeholder.com/150/007bff/ffffff?text=JD',
+    joinDate: '2025-01-01'
+  });
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editedProfile, setEditedProfile] = useState<UserProfile>(profile);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
 
+  // Load user profile from backend
   useEffect(() => {
-    // Mock session data - in a real app, this would come from an API
-    const mockSessions: TypingSession[] = [
-      {
-        id: '1',
-        date: '2025-01-19T14:30:00Z',
-        wpm: 85,
-        accuracy: 94,
-        duration: 60,
-        charactersTyped: 425,
-        errorCount: 26,
-        textLength: 451
-      },
-      {
-        id: '2',
-        date: '2025-01-19T09:15:00Z',
-        wpm: 78,
-        accuracy: 91,
-        duration: 90,
-        charactersTyped: 585,
-        errorCount: 58,
-        textLength: 643
-      },
-      {
-        id: '3',
-        date: '2025-01-18T16:45:00Z',
-        wpm: 82,
-        accuracy: 96,
-        duration: 75,
-        charactersTyped: 513,
-        errorCount: 21,
-        textLength: 534
-      },
-      {
-        id: '4',
-        date: '2025-01-18T11:20:00Z',
-        wpm: 73,
-        accuracy: 89,
-        duration: 60,
-        charactersTyped: 365,
-        errorCount: 45,
-        textLength: 410
-      },
-      {
-        id: '5',
-        date: '2025-01-17T19:30:00Z',
-        wpm: 80,
-        accuracy: 93,
-        duration: 120,
-        charactersTyped: 800,
-        errorCount: 60,
-        textLength: 860
-      },
-      {
-        id: '6',
-        date: '2025-01-17T13:10:00Z',
-        wpm: 76,
-        accuracy: 87,
-        duration: 60,
-        charactersTyped: 380,
-        errorCount: 59,
-        textLength: 439
-      },
-      {
-        id: '7',
-        date: '2025-01-16T20:45:00Z',
-        wpm: 71,
-        accuracy: 92,
-        duration: 90,
-        charactersTyped: 533,
-        errorCount: 46,
-        textLength: 579
-      },
-      {
-        id: '8',
-        date: '2025-01-16T15:25:00Z',
-        wpm: 68,
-        accuracy: 85,
-        duration: 60,
-        charactersTyped: 340,
-        errorCount: 64,
-        textLength: 404
+    const loadUserProfile = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const response = await fetch('/api/users/profile', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const user = data.user;
+          setProfile({
+            name: `${user.profile?.firstName || ''} ${user.profile?.lastName || ''}`.trim() || user.username,
+            email: user.email,
+            profileImage: user.profile?.avatar || `https://via.placeholder.com/150/007bff/ffffff?text=${user.username.charAt(0).toUpperCase()}`,
+            joinDate: user.createdAt || '2025-01-01'
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load profile:', error);
       }
-    ];
+    };
 
-    // Filter sessions based on time range
-    const now = new Date();
-    const filteredSessions = mockSessions.filter(session => {
-      const sessionDate = new Date(session.date);
-      if (timeRange === 'week') {
-        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        return sessionDate >= weekAgo;
-      } else if (timeRange === 'month') {
-        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        return sessionDate >= monthAgo;
+    loadUserProfile();
+  }, []);
+
+  // Load user statistics and sessions from backend
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        // Fetch user statistics
+        const statsResponse = await fetch(`/api/stats/user?timeframe=${timeRange}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json();
+          
+          // Convert database stats to dashboard format
+          const dbStats = statsData.stats;
+          setStats({
+            totalTests: dbStats.totalTests || 0,
+            averageWpm: Math.round(dbStats.averageWPM || 0),
+            averageAccuracy: Math.round(dbStats.averageAccuracy || 0),
+            totalTimeTyping: Math.round(dbStats.totalTimeTyped || 0),
+            bestWpm: dbStats.bestWPM || 0,
+            bestAccuracy: Math.round(dbStats.bestAccuracy || 0),
+            totalCharacters: dbStats.totalCharacters || 0,
+            improvementRate: 0 // Calculate this based on progress data
+          });
+
+          // Convert recent tests to sessions format
+          const recentTests = statsData.recentTests || [];
+          const convertedSessions: TypingSession[] = recentTests.map((test: any) => ({
+            id: test._id,
+            date: test.createdAt,
+            wpm: test.results.wpm,
+            accuracy: test.results.accuracy,
+            duration: test.results.timeElapsed,
+            charactersTyped: test.results.totalCharacters,
+            errorCount: test.results.totalCharacters - test.results.correctCharacters,
+            textLength: test.results.totalCharacters
+          }));
+
+          setSessions(convertedSessions);
+        } else {
+          console.error('Failed to fetch stats:', statsResponse.statusText);
+          // Fallback to empty stats
+          setStats({
+            totalTests: 0,
+            averageWpm: 0,
+            averageAccuracy: 0,
+            totalTimeTyping: 0,
+            bestWpm: 0,
+            bestAccuracy: 0,
+            totalCharacters: 0,
+            improvementRate: 0
+          });
+          setSessions([]);
+        }
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        // Fallback to empty data
+        setStats({
+          totalTests: 0,
+          averageWpm: 0,
+          averageAccuracy: 0,
+          totalTimeTyping: 0,
+          bestWpm: 0,
+          bestAccuracy: 0,
+          totalCharacters: 0,
+          improvementRate: 0
+        });
+        setSessions([]);
       }
-      return true;
-    });
+    };
 
-    setSessions(filteredSessions);
-    console.log('Filtered sessions:', filteredSessions); // Debug log
-
-    // Calculate stats
-    if (filteredSessions.length > 0) {
-      const totalTests = filteredSessions.length;
-      const totalWpm = filteredSessions.reduce((sum, s) => sum + s.wpm, 0);
-      const totalAccuracy = filteredSessions.reduce((sum, s) => sum + s.accuracy, 0);
-      const totalTime = filteredSessions.reduce((sum, s) => sum + s.duration, 0);
-      const totalChars = filteredSessions.reduce((sum, s) => sum + s.charactersTyped, 0);
-      const bestWpm = Math.max(...filteredSessions.map(s => s.wpm));
-      const bestAccuracy = Math.max(...filteredSessions.map(s => s.accuracy));
-
-      // Calculate improvement rate (comparing first half vs second half)
-      const midPoint = Math.floor(filteredSessions.length / 2);
-      const firstHalf = filteredSessions.slice(0, midPoint);
-      const secondHalf = filteredSessions.slice(midPoint);
-      
-      let improvementRate = 0;
-      if (firstHalf.length > 0 && secondHalf.length > 0) {
-        const firstHalfAvg = firstHalf.reduce((sum, s) => sum + s.wpm, 0) / firstHalf.length;
-        const secondHalfAvg = secondHalf.reduce((sum, s) => sum + s.wpm, 0) / secondHalf.length;
-        improvementRate = ((secondHalfAvg - firstHalfAvg) / firstHalfAvg) * 100;
-      }
-
-      setStats({
-        totalTests,
-        averageWpm: totalTests > 0 ? Math.round(totalWpm / totalTests) : 0,
-        averageAccuracy: totalTests > 0 ? Math.round(totalAccuracy / totalTests) : 0,
-        totalTimeTyping: totalTime,
-        bestWpm,
-        bestAccuracy,
-        totalCharacters: totalChars,
-        improvementRate: Math.round(improvementRate)
-      });
-    } else {
-      // Set default stats when no sessions
-      setStats({
-        totalTests: 0,
-        averageWpm: 0,
-        averageAccuracy: 0,
-        totalTimeTyping: 0,
-        bestWpm: 0,
-        bestAccuracy: 0,
-        totalCharacters: 0,
-        improvementRate: 0
-      });
-    }
+    loadDashboardData();
   }, [timeRange]);
 
   const formatDate = (dateString: string) => {
@@ -204,6 +183,77 @@ const Dashboard: React.FC = () => {
     return `${minutes}m ${remainingSeconds}s`;
   };
 
+  const handleProfileEdit = () => {
+    setIsEditingProfile(true);
+    setEditedProfile(profile);
+  };
+
+  const handleProfileSave = async () => {
+    setIsLoadingProfile(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in to update your profile');
+        return;
+      }
+
+      // Split name into first and last name
+      const nameParts = editedProfile.name.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      const response = await fetch('/api/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          profile: {
+            firstName,
+            lastName,
+            avatar: editedProfile.profileImage
+          }
+        })
+      });
+
+      if (response.ok) {
+        setProfile(editedProfile);
+        setIsEditingProfile(false);
+        alert('Profile updated successfully!');
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to update profile: ${errorData.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Profile update error:', error);
+      alert('Failed to update profile. Please try again.');
+    } finally {
+      setIsLoadingProfile(false);
+    }
+  };
+
+  const handleProfileCancel = () => {
+    setIsEditingProfile(false);
+    setEditedProfile(profile);
+  };
+
+  const handleProfileChange = (field: keyof UserProfile, value: string) => {
+    setEditedProfile(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const isValidImageUrl = (url: string): boolean => {
+    try {
+      new URL(url);
+      return /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(url) || url.includes('placeholder');
+    } catch {
+      return false;
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <main className="dashboard-main">
@@ -215,6 +265,106 @@ const Dashboard: React.FC = () => {
         <div className="theme-selector-section">
           <h3>Customize Your Experience</h3>
           <ThemeSelector />
+        </div>
+
+        <div className="profile-management-section">
+          <h3>Profile Management</h3>
+          <div className="profile-card">
+            <div className="profile-image-section">
+              <img 
+                src={isEditingProfile ? editedProfile.profileImage : profile.profileImage} 
+                alt="Profile"
+                className="profile-image"
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  const initials = profile.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                  img.src = `https://via.placeholder.com/150/007bff/ffffff?text=${initials}`;
+                }}
+              />
+              {isEditingProfile && (
+                <div className="image-input-section">
+                  <label htmlFor="profileImage">Profile Image URL:</label>
+                  <input
+                    type="url"
+                    id="profileImage"
+                    value={editedProfile.profileImage}
+                    onChange={(e) => handleProfileChange('profileImage', e.target.value)}
+                    placeholder="Enter image URL (jpg, png, gif, etc.)"
+                    className={`profile-input ${!isValidImageUrl(editedProfile.profileImage) && editedProfile.profileImage ? 'invalid' : ''}`}
+                  />
+                  {editedProfile.profileImage && !isValidImageUrl(editedProfile.profileImage) && (
+                    <small style={{color: 'var(--error)', fontSize: '0.8rem'}}>
+                      Please enter a valid image URL
+                    </small>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            <div className="profile-info">
+              <div className="profile-field">
+                <label>Name:</label>
+                {isEditingProfile ? (
+                  <input
+                    type="text"
+                    value={editedProfile.name}
+                    onChange={(e) => handleProfileChange('name', e.target.value)}
+                    className="profile-input"
+                  />
+                ) : (
+                  <span>{profile.name}</span>
+                )}
+              </div>
+
+              <div className="profile-field">
+                <label>Email:</label>
+                {isEditingProfile ? (
+                  <input
+                    type="email"
+                    value={editedProfile.email}
+                    onChange={(e) => handleProfileChange('email', e.target.value)}
+                    className="profile-input"
+                  />
+                ) : (
+                  <span>{profile.email}</span>
+                )}
+              </div>
+
+              <div className="profile-field">
+                <label>Member Since:</label>
+                <span>{new Date(profile.joinDate).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</span>
+              </div>
+
+              <div className="profile-actions">
+                {isEditingProfile ? (
+                  <>
+                    <button 
+                      onClick={handleProfileSave} 
+                      className="btn btn-save"
+                      disabled={isLoadingProfile}
+                    >
+                      {isLoadingProfile ? 'Saving...' : 'Save Changes'}
+                    </button>
+                    <button 
+                      onClick={handleProfileCancel} 
+                      className="btn btn-cancel"
+                      disabled={isLoadingProfile}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <button onClick={handleProfileEdit} className="btn btn-edit">
+                    Edit Profile
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="time-filter">
