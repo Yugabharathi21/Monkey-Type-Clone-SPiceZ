@@ -62,7 +62,7 @@ const SessionGraph: React.FC<SessionGraphProps> = ({
                     })
                     .join(' ')}
                   fill="none"
-                  stroke="var(--accent-color)"
+                  stroke="var(--accent)"
                   strokeWidth="2"
                   strokeLinecap="round"
                 />
@@ -79,7 +79,7 @@ const SessionGraph: React.FC<SessionGraphProps> = ({
                     })
                     .join(' ')}
                   fill="none"
-                  stroke="#4CAF50"
+                  stroke="var(--success)"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeDasharray="5,5"
@@ -92,7 +92,7 @@ const SessionGraph: React.FC<SessionGraphProps> = ({
                   cx="400"
                   cy={100 - (currentWpm / maxWpm) * 100}
                   r="4"
-                  fill="var(--accent-color)"
+                  fill="var(--accent)"
                   className="pulse-dot"
                 />
               )}

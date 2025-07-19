@@ -1,7 +1,7 @@
 /* Type Monkey Inspired Authentication Styles */
 .auth-container {
   min-height: 100vh;
-  background: #323437;
+  background: var(--background);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -11,7 +11,8 @@
   animation: pageLoad 1s ease-out forwards;
   position: relative;
   overflow: hidden;
-  color: #d1d0c5;
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .auth-wrapper {
@@ -26,8 +27,8 @@
 }
 
 .auth-card {
-  background: #2c2e31;
-  border: 2px solid #525252;
+  background: var(--background-secondary);
+  border: 2px solid var(--border-color);
   padding: 3rem;
   border-radius: 8px;
   box-shadow: 

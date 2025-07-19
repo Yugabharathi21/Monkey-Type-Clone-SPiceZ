@@ -1,11 +1,12 @@
 /* Type Monkey Inspired Typing Test Styles */
 .typing-container {
   min-height: 100vh;
-  background: #323437;
-  color: #d1d0c5;
+  background: var(--background);
+  color: var(--text-primary);
   font-family: 'Roboto Mono', 'Fira Code', 'Consolas', monospace;
   display: flex;
   flex-direction: column;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .typing-main {
@@ -25,9 +26,10 @@
   gap: 3rem;
   margin-bottom: 3rem;
   padding: 1rem 2rem;
-  background: #2c2e31;
+  background: var(--background-secondary);
   border-radius: 8px;
-  border: 1px solid #525252;
+  border: 1px solid var(--border-color);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .stat {
@@ -39,28 +41,29 @@
 
 .stat-label {
   font-size: 0.85rem;
-  color: #646669;
+  color: var(--text-secondary);
   text-transform: lowercase;
 }
 
 .stat-value {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #e2b714;
+  color: var(--accent);
 }
 
 .session-graph-container {
   width: 100%;
   margin-bottom: 2rem;
   padding: 1rem;
-  background: #2c2e31;
+  background: var(--background-secondary);
   border-radius: 8px;
-  border: 1px solid #525252;
+  border: 1px solid var(--border-color);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .text-display {
-  background: #2c2e31;
-  border: 2px solid #525252;
+  background: var(--background-secondary);
+  border: 2px solid var(--border-color);
   border-radius: 8px;
   padding: 2rem;
   margin-bottom: 2rem;
@@ -72,11 +75,12 @@
   position: relative;
   outline: none;
   cursor: text;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .text-display:focus {
-  border-color: #e2b714;
-  box-shadow: 0 0 0 3px rgba(226, 183, 20, 0.2);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.2);
 }
 
 .start-prompt {
@@ -84,7 +88,7 @@
   bottom: 1rem;
   left: 50%;
   transform: translateX(-50%);
-  color: #646669;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   font-style: italic;
   opacity: 0.7;
@@ -101,18 +105,18 @@
 }
 
 .char.correct {
-  color: #d1d0c5;
-  background: rgba(226, 183, 20, 0.1);
+  color: var(--text-primary);
+  background: rgba(var(--accent-rgb), 0.1);
 }
 
 .char.incorrect {
-  color: #ca4754;
-  background: rgba(202, 71, 84, 0.2);
+  color: var(--error);
+  background: rgba(var(--error), 0.2);
 }
 
 .char.current {
-  background: #e2b714;
-  color: #323437;
+  background: var(--accent);
+  color: var(--background);
   animation: blink 1s infinite;
 }
 
@@ -130,9 +134,9 @@
 }
 
 .control-btn {
-  background: #3c3e41;
-  border: 2px solid #525252;
-  color: #d1d0c5;
+  background: var(--background-secondary);
+  border: 2px solid var(--border-color);
+  color: var(--text-primary);
   padding: 0.75rem 1.5rem;
   border-radius: 6px;
   font-family: 'Roboto Mono', monospace;
@@ -142,9 +146,9 @@
 }
 
 .control-btn:hover {
-  border-color: #e2b714;
-  color: #e2b714;
-  background: #2c2e31;
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--background-secondary);
   transform: translateY(-2px);
 }
 
@@ -169,7 +173,7 @@
 }
 
 .results h2 {
-  color: #e2b714;
+  color: var(--accent);
   font-size: 2rem;
   margin-bottom: 2rem;
   text-align: center;
@@ -184,8 +188,8 @@
 }
 
 .result-item {
-  background: #2c2e31;
-  border: 1px solid #525252;
+  background: var(--background-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 1.5rem;
   text-align: center;
@@ -193,7 +197,7 @@
 
 .result-label {
   display: block;
-  color: #646669;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
   text-transform: lowercase;
@@ -201,15 +205,15 @@
 
 .result-value {
   display: block;
-  color: #e2b714;
+  color: var(--accent);
   font-size: 1.8rem;
   font-weight: 600;
 }
 
 .retry-btn {
-  background: #e2b714;
-  color: #323437;
-  border: 2px solid #e2b714;
+  background: var(--accent);
+  color: var(--background);
+  border: 2px solid var(--accent);
   padding: 1rem 2rem;
   border-radius: 8px;
   font-family: 'Roboto Mono', monospace;
@@ -220,10 +224,10 @@
 }
 
 .retry-btn:hover {
-  background: #d1a513;
-  border-color: #d1a513;
+  background: var(--accent);
+  border-color: var(--accent);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(226, 183, 20, 0.3);
+  box-shadow: 0 8px 25px rgba(var(--accent-rgb), 0.3);
 }
 
 /* Responsive Design */

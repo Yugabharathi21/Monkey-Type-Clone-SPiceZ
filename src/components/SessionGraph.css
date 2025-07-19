@@ -1,6 +1,6 @@
 /* Session Graph Styles */
 .session-graph {
-  background: var(--card-bg);
+  background: var(--card-background);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 1rem;
@@ -11,7 +11,7 @@
 
 .session-graph.active {
   opacity: 1;
-  border-color: var(--accent-color);
+  border-color: var(--accent);
   box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.2);
 }
 
@@ -23,7 +23,7 @@
 }
 
 .graph-header h3 {
-  color: var(--accent-color);
+  color: var(--accent);
   font-size: 1rem;
   margin: 0;
   font-weight: 600;
@@ -35,7 +35,7 @@
 }
 
 .current-wpm {
-  color: var(--accent-color);
+  color: var(--accent);
   font-weight: 600;
   font-size: 0.9rem;
 }

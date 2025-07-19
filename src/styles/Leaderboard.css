@@ -1,9 +1,10 @@
 /* Leaderboard Styles */
 .leaderboard-container {
   min-height: 100vh;
-  background: #323437;
-  color: #d1d0c5;
+  background: var(--background);
+  color: var(--text-primary);
   font-family: 'Roboto Mono', 'Fira Code', 'Consolas', monospace;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .leaderboard-main {
@@ -19,13 +20,13 @@
 
 .leaderboard-title h2 {
   font-size: 2.5rem;
-  color: #e2b714;
+  color: var(--accent);
   margin: 0 0 0.5rem 0;
   font-weight: 600;
 }
 
 .leaderboard-title p {
-  color: #646669;
+  color: var(--text-secondary);
   font-size: 1.1rem;
   margin: 0;
 }
@@ -45,15 +46,15 @@
 }
 
 .filter-group label {
-  color: #d1d0c5;
+  color: var(--text-primary);
   font-size: 0.95rem;
   font-weight: 500;
 }
 
 .filter-select {
-  background: #2c2e31;
-  border: 2px solid #525252;
-  color: #d1d0c5;
+  background: var(--background-secondary);
+  border: 2px solid var(--border-color);
+  color: var(--text-primary);
   padding: 0.5rem 1rem;
   border-radius: 4px;
   font-family: 'Roboto Mono', monospace;
@@ -64,22 +65,22 @@
 
 .filter-select:focus {
   outline: none;
-  border-color: #e2b714;
+  border-color: var(--accent);
 }
 
 .leaderboard-table {
-  background: #2c2e31;
+  background: var(--background-secondary);
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #525252;
+  border: 1px solid var(--border-color);
   margin-bottom: 3rem;
 }
 
 .table-header {
   display: grid;
   grid-template-columns: 80px 1fr 80px 100px 100px 120px;
-  background: #3c3e41;
-  border-bottom: 1px solid #525252;
+  background: var(--background-secondary);
+  border-bottom: 1px solid var(--border-color);
   font-weight: 600;
   font-size: 0.9rem;
   text-transform: uppercase;
@@ -88,7 +89,7 @@
 
 .header-cell {
   padding: 1rem 0.75rem;
-  color: #e2b714;
+  color: var(--accent);
   text-align: center;
 }
 
@@ -100,12 +101,13 @@
 .table-row {
   display: grid;
   grid-template-columns: 80px 1fr 80px 100px 100px 120px;
-  border-bottom: 1px solid #525252;
+  border-bottom: 1px solid var(--border-color);
   transition: background-color 0.2s ease;
 }
 
 .table-row:hover {
-  background: #3c3e41;
+  background: var(--background-secondary);
+  filter: brightness(1.1);
 }
 
 .table-row.rank-gold {
@@ -137,7 +139,7 @@
 
 .rank-number {
   font-weight: 600;
-  color: #d1d0c5;
+  color: var(--text-primary);
 }
 
 .medal {
@@ -146,30 +148,30 @@
 
 .username {
   font-weight: 500;
-  color: #d1d0c5;
+  color: var(--text-primary);
 }
 
 .wpm-value {
   font-weight: 600;
-  color: #e2b714;
+  color: var(--accent);
   font-size: 1.1rem;
 }
 
 .accuracy-value {
-  color: #7cc683;
+  color: var(--success);
   font-weight: 500;
 }
 
 .date-value,
 .characters-value {
-  color: #646669;
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
 .no-data {
   text-align: center;
   padding: 3rem;
-  color: #646669;
+  color: var(--text-secondary);
   font-style: italic;
 }
 
@@ -181,14 +183,14 @@
 }
 
 .info-card {
-  background: #2c2e31;
-  border: 1px solid #525252;
+  background: var(--background-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 2rem;
 }
 
 .info-card h3 {
-  color: #e2b714;
+  color: var(--accent);
   font-size: 1.3rem;
   margin: 0 0 1rem 0;
   font-weight: 600;
@@ -201,7 +203,7 @@
 }
 
 .info-card li {
-  color: #d1d0c5;
+  color: var(--text-primary);
   font-size: 0.95rem;
   margin-bottom: 0.5rem;
   position: relative;
@@ -212,44 +214,46 @@
   content: '▸';
   position: absolute;
   left: 0;
-  color: #e2b714;
+  color: var(--accent);
 }
 
 .info-card p {
-  color: #d1d0c5;
+  color: var(--text-primary);
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }
 
 .signup-link {
-  color: #e2b714;
+  color: var(--accent);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
 }
 
 .signup-link:hover {
-  color: #d1a513;
+  color: var(--accent);
+  filter: brightness(0.8);
 }
 
 .start-test-btn {
   display: inline-block;
-  background: #e2b714;
-  color: #323437;
+  background: var(--accent);
+  color: var(--background);
   text-decoration: none;
   padding: 0.75rem 1.5rem;
   border-radius: 6px;
   font-weight: 600;
   font-size: 0.95rem;
   transition: all 0.3s ease;
-  border: 2px solid #e2b714;
+  border: 2px solid var(--accent);
 }
 
 .start-test-btn:hover {
-  background: #d1a513;
-  border-color: #d1a513;
+  background: var(--accent);
+  border-color: var(--accent);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(226, 183, 20, 0.3);
+  box-shadow: 0 8px 25px rgba(var(--accent-rgb), 0.3);
+  filter: brightness(0.9);
 }
 
 /* Responsive Design */
@@ -317,14 +321,14 @@
 }
 
 .table-body::-webkit-scrollbar-track {
-  background: #323437;
+  background: var(--background);
 }
 
 .table-body::-webkit-scrollbar-thumb {
-  background: #525252;
+  background: var(--border-color);
   border-radius: 4px;
 }
 
 .table-body::-webkit-scrollbar-thumb:hover {
-  background: #646669;
+  background: var(--accent);
 }
