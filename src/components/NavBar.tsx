@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoginModal from './LoginModal';
 import ProfilePicture from './ProfilePicture';
+import Logo from './Logo';
 import './NavBar.css';
 
 const NavBar: React.FC = () => {
@@ -28,7 +29,7 @@ const NavBar: React.FC = () => {
         <div className="navbar-content">
           <div className="navbar-logo">
             <Link to="/">
-              <h1>TypeMonkey</h1>
+              <Logo size="medium" showText={true} />
             </Link>
           </div>
           <nav className="navbar-links">

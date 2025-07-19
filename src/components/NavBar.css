@@ -18,6 +18,28 @@
   align-items: center;
 }
 
+.navbar-logo {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo a {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo a {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
 .navbar-logo h1 {
   color: var(--accent);
   font-size: 1.5rem;
@@ -25,10 +47,6 @@
   margin: 0;
   text-decoration: none;
   font-family: 'Roboto Mono', monospace;
-}
-
-.navbar-logo a {
-  text-decoration: none;
 }
 
 .navbar-links {
@@ -154,6 +172,10 @@
 
   .navbar-logo h1 {
     font-size: 1.3rem;
+  }
+
+  .navbar-logo .logo-medium .logo-text-label {
+    font-size: 1rem;
   }
 
   .user-menu {

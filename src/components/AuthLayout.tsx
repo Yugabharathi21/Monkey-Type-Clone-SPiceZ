@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Logo from './Logo';
 import '../styles/AuthLayout.css';
 
 interface AuthLayoutProps {
@@ -11,7 +12,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
     <div className="auth-layout">
       <div className="auth-header-nav">
         <Link to="/" className="auth-brand">
-          <span className="brand-text">TypeMaster</span>
+          <Logo size="medium" showText={true} />
         </Link>
         <nav className="auth-nav">
           <Link to="/login" className="auth-nav-link">Login</Link>

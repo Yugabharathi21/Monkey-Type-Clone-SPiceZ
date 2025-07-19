@@ -1,0 +1,56 @@
+/* Theme-aware logo variants */
+:root {
+  --logo-primary: #e2b714;
+  --logo-background: #ffffff;
+  --logo-secondary: #f8f9fa;
+  --logo-accent: #48bb78;
+}
+
+[data-theme="dark"] {
+  --logo-primary: #e2b714;
+  --logo-background: #1a1a1a;
+  --logo-secondary: #2d2d2d;
+  --logo-accent: #68d391;
+}
+
+/* Theme switching for SVG logos */
+.logo-svg.theme-aware .logo-background {
+  fill: var(--logo-primary);
+}
+
+.logo-svg.theme-aware .logo-text {
+  fill: var(--logo-background);
+}
+
+.logo-svg.theme-aware .logo-underline {
+  fill: var(--logo-secondary);
+}
+
+.logo-svg.theme-aware .logo-accent {
+  fill: var(--logo-accent);
+}
+
+/* Hover effects for logo */
+.logo-svg:hover {
+  filter: brightness(1.1) saturate(1.1);
+  transform: scale(1.02);
+}
+
+/* Fallback for browsers that don't support CSS custom properties */
+@supports not (color: var(--logo-primary)) {
+  .logo-background {
+    fill: #e2b714;
+  }
+  
+  .logo-text {
+    fill: #ffffff;
+  }
+  
+  .logo-underline {
+    fill: #f8f9fa;
+  }
+  
+  .logo-accent {
+    fill: #48bb78;
+  }
+}

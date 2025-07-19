@@ -1,0 +1,148 @@
+/* Logo Component Styles */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.logo-container:hover {
+  transform: scale(1.05);
+}
+
+/* Size variants */
+.logo-small .logo-svg {
+  width: 24px;
+  height: 24px;
+}
+
+.logo-small .logo-text-label {
+  font-size: 1rem;
+}
+
+.logo-medium .logo-svg {
+  width: 32px;
+  height: 32px;
+}
+
+.logo-medium .logo-text-label {
+  font-size: 1.2rem;
+}
+
+.logo-large .logo-svg {
+  width: 48px;
+  height: 48px;
+}
+
+.logo-large .logo-text-label {
+  font-size: 1.5rem;
+}
+
+/* SVG styling with theme awareness */
+.logo-svg {
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+/* Light theme colors */
+.logo-background {
+  fill: var(--accent, #e2b714);
+}
+
+.logo-text {
+  fill: var(--background, #ffffff);
+}
+
+.logo-underline {
+  fill: var(--background-secondary, #f8f9fa);
+}
+
+.logo-accent {
+  fill: var(--success, #48bb78);
+}
+
+/* Text label styling */
+.logo-text-label {
+  color: var(--accent, #e2b714);
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+  .logo-background {
+    fill: var(--accent, #e2b714);
+  }
+  
+  .logo-text {
+    fill: var(--background, #1a1a1a);
+  }
+  
+  .logo-underline {
+    fill: var(--background-secondary, #2d2d2d);
+  }
+  
+  .logo-accent {
+    fill: var(--success, #68d391);
+  }
+}
+
+/* Hover effects */
+.logo-container:hover .logo-svg {
+  filter: brightness(1.1);
+}
+
+.logo-container:hover .logo-text-label {
+  color: var(--accent-hover, #d4a015);
+}
+
+/* Animation for interactive states */
+@keyframes logo-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.logo-container.active {
+  animation: logo-pulse 2s ease-in-out infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .logo-medium .logo-svg {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .logo-medium .logo-text-label {
+    font-size: 1.1rem;
+  }
+  
+  .logo-large .logo-svg {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .logo-large .logo-text-label {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-container {
+    gap: 0.5rem;
+  }
+  
+  .logo-small .logo-text-label {
+    font-size: 0.9rem;
+  }
+  
+  .logo-medium .logo-text-label {
+    font-size: 1rem;
+  }
+}

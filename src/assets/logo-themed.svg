@@ -1,0 +1,6 @@
+<svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="100" height="100" rx="20" fill="currentColor"/>
+<path d="M20 30H80V40H60V70H50V40H30V70H20V30Z" fill="var(--background)"/>
+<path d="M25 75H75V85H25V75Z" fill="var(--text-secondary)"/>
+<circle cx="70" cy="25" r="8" fill="var(--accent)"/>
+</svg>
