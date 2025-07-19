@@ -48,6 +48,7 @@ const TypingTest: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false); // Add this to prevent multiple submissions
   const [startTime, setStartTime] = useState<number | null>(null);
   const [wpmHistory, setWpmHistory] = useState<number[]>([]);
   const [accuracyHistory, setAccuracyHistory] = useState<number[]>([]);
@@ -128,7 +129,9 @@ const TypingTest: React.FC = () => {
   }, [userInput, currentText, startTime]);
 
   const submitTestResults = React.useCallback(async () => {
-    if (!startTime) return;
+    if (!startTime || isSubmitted) return; // Prevent multiple submissions
+    
+    setIsSubmitted(true); // Mark as submitted to prevent duplicates
 
     const finalStats = {
       wpm: stats.wpm,
@@ -190,15 +193,17 @@ const TypingTest: React.FC = () => {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Test results submitted successfully:', result);
+        console.log('✅ Test results submitted successfully:', result);
       } else {
         const error = await response.json();
-        console.error('Failed to submit test results:', error);
+        console.error('❌ Failed to submit test results:', error);
+        setIsSubmitted(false); // Reset on error so user can retry
       }
     } catch (error) {
-      console.error('Error submitting test results:', error);
+      console.error('❌ Error submitting test results:', error);
+      setIsSubmitted(false); // Reset on error so user can retry
     }
-  }, [startTime, stats, userInput.length, currentText, wpmHistory, accuracyHistory]);
+  }, [startTime, stats, userInput.length, currentText, wpmHistory, accuracyHistory, isSubmitted]);
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -247,19 +252,20 @@ const TypingTest: React.FC = () => {
 
   // Check if test is completed
   useEffect(() => {
-    if (userInput.length === currentText.length && userInput.length > 0) {
+    if (userInput.length === currentText.length && userInput.length > 0 && !isSubmitted) {
       setIsCompleted(true);
       calculateFinalStats();
-      // Submit results to database
+      // Submit results to database only once
       submitTestResults();
     }
-  }, [userInput, currentText, calculateFinalStats, submitTestResults]);
+  }, [userInput, currentText, calculateFinalStats, submitTestResults, isSubmitted]);
 
   const resetTest = () => {
     setUserInput('');
     setCurrentIndex(0);
     setIsStarted(false);
     setIsCompleted(false);
+    setIsSubmitted(false); // Reset submission state
     setStartTime(null);
     setWpmHistory([]);
     setAccuracyHistory([]);
