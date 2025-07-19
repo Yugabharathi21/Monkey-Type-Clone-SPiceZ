@@ -88,6 +88,16 @@
   gap: 1rem;
 }
 
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.navbar-profile-picture {
+  flex-shrink: 0;
+}
+
 .username {
   color: var(--text-color);
   font-family: 'Roboto Mono', monospace;
@@ -125,6 +135,11 @@
     text-align: center;
   }
 
+  .user-info {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
   .username {
     font-size: 0.8rem;
   }
@@ -142,6 +157,10 @@
   }
 
   .user-menu {
+    gap: 0.3rem;
+  }
+
+  .user-info {
     gap: 0.3rem;
   }
 }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoginModal from './LoginModal';
+import ProfilePicture from './ProfilePicture';
 import './NavBar.css';
 
 const NavBar: React.FC = () => {
@@ -53,7 +54,15 @@ const NavBar: React.FC = () => {
             {/* Authentication Button */}
             {isAuthenticated ? (
               <div className="user-menu">
-                <span className="username">Welcome, {user?.username}</span>
+                <div className="user-info">
+                  <ProfilePicture
+                    src={user?.profile?.avatar}
+                    username={user?.username || 'User'}
+                    size="medium"
+                    className="navbar-profile-picture"
+                  />
+                  <span className="username">Welcome, {user?.username}</span>
+                </div>
                 <button className="navbar-logout-btn" onClick={handleLogout}>
                   logout
                 </button>
