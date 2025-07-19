@@ -32,6 +32,12 @@ interface UserProfile {
   joinDate: string;
 }
 
+interface ChartData {
+  wpmProgress: { date: string; wpm: number; accuracy: number }[];
+  weeklyActivity: { [key: string]: number };
+  consistencyScore: number;
+}
+
 const Dashboard: React.FC = () => {
   const [sessions, setSessions] = useState<TypingSession[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
@@ -54,6 +60,12 @@ const Dashboard: React.FC = () => {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editedProfile, setEditedProfile] = useState<UserProfile>(profile);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const [chartData, setChartData] = useState<ChartData>({
+    wpmProgress: [],
+    weeklyActivity: {},
+    consistencyScore: 0
+  });
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
   // Load user profile from backend
   useEffect(() => {
@@ -90,12 +102,16 @@ const Dashboard: React.FC = () => {
   // Load user statistics and sessions from backend
   useEffect(() => {
     const loadDashboardData = async () => {
+      setIsLoadingData(true);
       try {
         const token = localStorage.getItem('token');
-        if (!token) return;
+        if (!token) {
+          setIsLoadingData(false);
+          return;
+        }
 
         // Fetch user statistics
-        const statsResponse = await fetch(`/api/stats/user?timeframe=${timeRange}`, {
+        const statsResponse = await fetch(`/api/stats/user?timeframe=${timeRange}&groupBy=day`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -115,12 +131,22 @@ const Dashboard: React.FC = () => {
             bestWpm: dbStats.bestWPM || 0,
             bestAccuracy: Math.round(dbStats.bestAccuracy || 0),
             totalCharacters: dbStats.totalCharacters || 0,
-            improvementRate: 0 // Calculate this based on progress data
+            improvementRate: 0 // Calculate from progress data
           });
 
           // Convert recent tests to sessions format
           const recentTests = statsData.recentTests || [];
-          const convertedSessions: TypingSession[] = recentTests.map((test: any) => ({
+          const convertedSessions: TypingSession[] = recentTests.map((test: {
+            _id: string;
+            createdAt: string;
+            results: {
+              wpm: number;
+              accuracy: number;
+              timeElapsed: number;
+              totalCharacters: number;
+              correctCharacters: number;
+            };
+          }) => ({
             id: test._id,
             date: test.createdAt,
             wpm: test.results.wpm,
@@ -132,6 +158,64 @@ const Dashboard: React.FC = () => {
           }));
 
           setSessions(convertedSessions);
+
+          // Process progress data for charts
+          const progressData = statsData.progressData || [];
+          const wpmProgress = progressData.map((point: {
+            _id: string;
+            averageWPM: number;
+            averageAccuracy: number;
+            date: string;
+          }) => ({
+            date: point._id,
+            wpm: Math.round(point.averageWPM || 0),
+            accuracy: Math.round(point.averageAccuracy || 0)
+          }));
+
+          // Calculate weekly activity from sessions
+          const weeklyActivity: { [key: string]: number } = {};
+          const now = new Date();
+          for (let i = 0; i < 28; i++) {
+            const date = new Date(now);
+            date.setDate(date.getDate() - i);
+            const dateKey = date.toISOString().split('T')[0];
+            weeklyActivity[dateKey] = 0;
+          }
+
+          convertedSessions.forEach(session => {
+            const sessionDate = new Date(session.date).toISOString().split('T')[0];
+            if (sessionDate in weeklyActivity) {
+              weeklyActivity[sessionDate]++;
+            }
+          });
+
+          convertedSessions.forEach(session => {
+            const sessionDate = new Date(session.date).toISOString().split('T')[0];
+            if (sessionDate in weeklyActivity) {
+              weeklyActivity[sessionDate]++;
+            }
+          });
+          let improvementRate = 0;
+          if (wpmProgress.length >= 2) {
+            const firstWpm = wpmProgress[0]?.wpm || 0;
+            const lastWpm = wpmProgress[wpmProgress.length - 1]?.wpm || 0;
+            if (firstWpm > 0) {
+              improvementRate = ((lastWpm - firstWpm) / firstWpm) * 100;
+            }
+          }
+
+          setChartData({
+            wpmProgress,
+            weeklyActivity,
+            consistencyScore: statsData.consistencyScore || 0
+          });
+
+          // Update stats with calculated improvement rate
+          setStats(prev => ({
+            ...prev,
+            improvementRate: Math.round(improvementRate)
+          }));
+
         } else {
           console.error('Failed to fetch stats:', statsResponse.statusText);
           // Fallback to empty stats
@@ -146,6 +230,11 @@ const Dashboard: React.FC = () => {
             improvementRate: 0
           });
           setSessions([]);
+          setChartData({
+            wpmProgress: [],
+            weeklyActivity: {},
+            consistencyScore: 0
+          });
         }
       } catch (error) {
         console.error('Error loading dashboard data:', error);
@@ -161,6 +250,13 @@ const Dashboard: React.FC = () => {
           improvementRate: 0
         });
         setSessions([]);
+        setChartData({
+          wpmProgress: [],
+          weeklyActivity: {},
+          consistencyScore: 0
+        });
+      } finally {
+        setIsLoadingData(false);
       }
     };
 
@@ -450,20 +546,24 @@ const Dashboard: React.FC = () => {
           <div className="chart-container">
             <h3>WPM Progress Over Time</h3>
             <div className="line-chart">
-              {sessions.length > 0 ? (
+              {isLoadingData ? (
+                <div className="no-chart-data">
+                  <p>📊 Loading chart data...</p>
+                </div>
+              ) : chartData.wpmProgress.length > 0 ? (
                 <div className="chart-grid">
-                  {sessions.slice(-7).map((session) => {
-                    const maxWpm = Math.max(...sessions.map(s => s.wpm));
-                    const height = maxWpm > 0 ? (session.wpm / maxWpm) * 100 : 50;
+                  {chartData.wpmProgress.slice(-7).map((dataPoint, index) => {
+                    const maxWpm = Math.max(...chartData.wpmProgress.map(d => d.wpm));
+                    const height = maxWpm > 0 ? (dataPoint.wpm / maxWpm) * 100 : 50;
                     return (
-                      <div key={session.id} className="chart-bar">
+                      <div key={`${dataPoint.date}-${index}`} className="chart-bar">
                         <div 
                           className="bar wpm-bar"
                           style={{ height: `${height}%` }}
-                          title={`${session.wpm} WPM`}
+                          title={`${dataPoint.wpm} WPM`}
                         ></div>
                         <span className="bar-label">
-                          {new Date(session.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          {new Date(dataPoint.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </span>
                       </div>
                     );
@@ -481,19 +581,23 @@ const Dashboard: React.FC = () => {
           <div className="chart-container">
             <h3>Accuracy Trends</h3>
             <div className="line-chart">
-              {sessions.length > 0 ? (
+              {isLoadingData ? (
+                <div className="no-chart-data">
+                  <p>🎯 Loading accuracy data...</p>
+                </div>
+              ) : chartData.wpmProgress.length > 0 ? (
                 <div className="chart-grid">
-                  {sessions.slice(-7).map((session) => {
-                    const height = session.accuracy;
+                  {chartData.wpmProgress.slice(-7).map((dataPoint, index) => {
+                    const height = dataPoint.accuracy;
                     return (
-                      <div key={session.id} className="chart-bar">
+                      <div key={`accuracy-${dataPoint.date}-${index}`} className="chart-bar">
                         <div 
                           className="bar accuracy-bar"
                           style={{ height: `${height}%` }}
-                          title={`${session.accuracy}% Accuracy`}
+                          title={`${dataPoint.accuracy}% Accuracy`}
                         ></div>
                         <span className="bar-label">
-                          {new Date(session.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          {new Date(dataPoint.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </span>
                       </div>
                     );
@@ -518,12 +622,16 @@ const Dashboard: React.FC = () => {
                   <div key={day} className="heatmap-column">
                     <div className="heatmap-label">{day}</div>
                     {[0, 1, 2, 3].map(week => {
-                      const intensity = Math.floor(Math.random() * 4); // Mock data
+                      const date = new Date();
+                      date.setDate(date.getDate() - (week * 7) - (['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(day)));
+                      const dateKey = date.toISOString().split('T')[0];
+                      const activity = chartData.weeklyActivity[dateKey] || 0;
+                      const intensity = Math.min(3, Math.floor(activity / 2)); // Convert activity count to intensity level
                       return (
                         <div 
                           key={week}
                           className={`heatmap-cell intensity-${intensity}`}
-                          title={`${day} - Week ${week + 1}: ${intensity * 25}% activity`}
+                          title={`${day} ${date.toLocaleDateString()}: ${activity} tests`}
                         ></div>
                       );
                     })}

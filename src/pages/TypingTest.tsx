@@ -11,6 +11,31 @@ interface TypingStats {
   incorrectCharacters: number;
 }
 
+interface TestSubmissionData {
+  testConfig: {
+    textType: string;
+    difficulty: string;
+    duration: number;
+    language: string;
+  };
+  testContent: {
+    originalText: string;
+    textSource: string;
+    textId: null;
+  };
+  results: TypingStats;
+  keystrokeData: unknown[];
+  wpmHistory: { timestamp: number; wpm: number; }[];
+  accuracyHistory: { timestamp: number; accuracy: number; }[];
+  metadata: {
+    userAgent: string;
+    timestamp: string;
+  };
+  isCompleted: boolean;
+  isGuest?: boolean;
+  guestId?: string;
+}
+
 const sampleTexts = [
   "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the alphabet.",
   "Programming is not about typing, it's about thinking. Speed comes with practice and understanding.",
@@ -102,6 +127,79 @@ const TypingTest: React.FC = () => {
     });
   }, [userInput, currentText, startTime]);
 
+  const submitTestResults = React.useCallback(async () => {
+    if (!startTime) return;
+
+    const finalStats = {
+      wpm: stats.wpm,
+      accuracy: stats.accuracy,
+      timeElapsed: Math.round((Date.now() - startTime) / 1000),
+      totalCharacters: userInput.length,
+      correctCharacters: stats.correctCharacters,
+      incorrectCharacters: userInput.length - stats.correctCharacters,
+    };
+
+    const testData: TestSubmissionData = {
+      testConfig: {
+        textType: 'random',
+        difficulty: 'medium',
+        duration: finalStats.timeElapsed,
+        language: 'english',
+      },
+      testContent: {
+        originalText: currentText,
+        textSource: 'default',
+        textId: null,
+      },
+      results: finalStats,
+      keystrokeData: [], // Could be enhanced to track individual keystrokes
+      wpmHistory: wpmHistory.map((wpm, index) => ({
+        timestamp: startTime + (index * 5000), // Approximate timestamp every 5 seconds
+        wpm
+      })),
+      accuracyHistory: accuracyHistory.map((accuracy, index) => ({
+        timestamp: startTime + (index * 5000), // Approximate timestamp every 5 seconds
+        accuracy
+      })),
+      metadata: {
+        userAgent: navigator.userAgent,
+        timestamp: new Date().toISOString(),
+      },
+      isCompleted: true,
+    };
+
+    try {
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      } else {
+        // Handle as guest user
+        testData.isGuest = true;
+        testData.guestId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      }
+
+      const response = await fetch('/api/tests/submit', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(testData),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Test results submitted successfully:', result);
+      } else {
+        const error = await response.json();
+        console.error('Failed to submit test results:', error);
+      }
+    } catch (error) {
+      console.error('Error submitting test results:', error);
+    }
+  }, [startTime, stats, userInput.length, currentText, wpmHistory, accuracyHistory]);
+
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       // Only handle keyboard events if we're on the typing test page
@@ -152,8 +250,10 @@ const TypingTest: React.FC = () => {
     if (userInput.length === currentText.length && userInput.length > 0) {
       setIsCompleted(true);
       calculateFinalStats();
+      // Submit results to database
+      submitTestResults();
     }
-  }, [userInput, currentText, calculateFinalStats]);
+  }, [userInput, currentText, calculateFinalStats, submitTestResults]);
 
   const resetTest = () => {
     setUserInput('');

@@ -71,7 +71,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('token'); // Changed from 'authToken' to 'token'
       if (!token) {
         setLoading(false);
         return;
@@ -89,11 +89,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(data.user);
       } else {
         // Invalid token, remove it
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('token'); // Changed from 'authToken' to 'token'
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      localStorage.removeItem('authToken');
+      localStorage.removeItem('token'); // Changed from 'authToken' to 'token'
     } finally {
       setLoading(false);
     }
@@ -116,7 +116,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (response.ok) {
         // Store token and user data
-        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('token', data.token);
         setUser(data.user);
         return true;
       } else {
@@ -149,7 +149,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (response.ok) {
         // Store token and user data
-        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('token', data.token);
         setUser(data.user);
         return true;
       } else {
@@ -166,7 +166,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('token');
     setUser(null);
     setError(null);
   };
