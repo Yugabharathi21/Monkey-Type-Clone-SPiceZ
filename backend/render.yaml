@@ -1,0 +1,23 @@
+version: "1"
+services:
+  - type: web
+    name: typemonkey-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRE
+        value: 7d
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 1000
+      # Add these environment variables in Render dashboard:
+      # MONGODB_URI: Your MongoDB Atlas connection string
+      # FRONTEND_URL: Your Vercel frontend URL
