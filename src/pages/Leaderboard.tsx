@@ -2,146 +2,103 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/Leaderboard.css';
 
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
 interface LeaderboardEntry {
-  id: string;
+  _id: string;
   username: string;
-  wpm: number;
-  accuracy: number;
-  testDate: string;
-  testDuration: number;
-  charactersTyped: number;
+  profile?: {
+    firstName?: string;
+    lastName?: string;
+    bio?: string;
+    country?: string;
+    preferredLanguage?: string;
+    avatar?: string;
+  };
+  bestWPM: number;
+  bestAccuracy: number;
+  averageWPM: number;
+  averageAccuracy: number;
+  totalTests: number;
+  recentTestDate: string;
+  consistencyScore?: number;
+  rank: number;
+}
+
+interface LeaderboardResponse {
+  leaderboard: LeaderboardEntry[];
+  metadata: {
+    timeframe: string;
+    metric: string;
+    category: string;
+    totalParticipants: number;
+    entriesShown: number;
+    lastUpdated: string;
+  };
 }
 
 const Leaderboard: React.FC = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
-  const [timeFilter, setTimeFilter] = useState<'all' | 'week' | 'month'>('all');
-  const [sortBy, setSortBy] = useState<'wpm' | 'accuracy'>('wpm');
+  const [timeFilter, setTimeFilter] = useState<'all' | 'weekly' | 'monthly'>('all');
+  const [sortBy, setSortBy] = useState<'wpm' | 'accuracy' | 'consistency'>('wpm');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [metadata, setMetadata] = useState<any>(null);
 
-  // Mock data - in a real app, this would come from an API
-  const mockLeaderboardData: LeaderboardEntry[] = [
-    {
-      id: '1',
-      username: 'SpeedTyper',
-      wpm: 142,
-      accuracy: 98,
-      testDate: '2025-01-19',
-      testDuration: 60,
-      charactersTyped: 712
-    },
-    {
-      id: '2',
-      username: 'KeyboardNinja',
-      wpm: 138,
-      accuracy: 96,
-      testDate: '2025-01-19',
-      testDuration: 60,
-      charactersTyped: 690
-    },
-    {
-      id: '3',
-      username: 'TypeMaster',
-      wpm: 135,
-      accuracy: 99,
-      testDate: '2025-01-18',
-      testDuration: 60,
-      charactersTyped: 675
-    },
-    {
-      id: '4',
-      username: 'QuickFingers',
-      wpm: 128,
-      accuracy: 94,
-      testDate: '2025-01-18',
-      testDuration: 60,
-      charactersTyped: 640
-    },
-    {
-      id: '5',
-      username: 'TypeRacer',
-      wpm: 125,
-      accuracy: 97,
-      testDate: '2025-01-17',
-      testDuration: 60,
-      charactersTyped: 625
-    },
-    {
-      id: '6',
-      username: 'FastTypist',
-      wpm: 122,
-      accuracy: 95,
-      testDate: '2025-01-17',
-      testDuration: 60,
-      charactersTyped: 610
-    },
-    {
-      id: '7',
-      username: 'CodeTyper',
-      wpm: 118,
-      accuracy: 92,
-      testDate: '2025-01-16',
-      testDuration: 60,
-      charactersTyped: 590
-    },
-    {
-      id: '8',
-      username: 'TypingPro',
-      wpm: 115,
-      accuracy: 98,
-      testDate: '2025-01-16',
-      testDuration: 60,
-      charactersTyped: 575
-    },
-    {
-      id: '9',
-      username: 'KeyWarrior',
-      wpm: 112,
-      accuracy: 89,
-      testDate: '2025-01-15',
-      testDuration: 60,
-      charactersTyped: 560
-    },
-    {
-      id: '10',
-      username: 'TypingGuru',
-      wpm: 108,
-      accuracy: 93,
-      testDate: '2025-01-15',
-      testDuration: 60,
-      charactersTyped: 540
+  // Fetch leaderboard data from API
+  const fetchLeaderboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const params = new URLSearchParams({
+        timeframe: timeFilter,
+        metric: sortBy,
+        limit: '50',
+        category: 'all'
+      });
+
+      const response = await fetch(`${API_BASE_URL}/leaderboard?${params}`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch leaderboard: ${response.status}`);
+      }
+
+      const data: LeaderboardResponse = await response.json();
+      setLeaderboardData(data.leaderboard);
+      setMetadata(data.metadata);
+    } catch (err) {
+      console.error('Error fetching leaderboard:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load leaderboard data');
+      // Fallback to empty array if API fails
+      setLeaderboardData([]);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   useEffect(() => {
-    // Filter and sort data based on current filters
-    let filteredData = [...mockLeaderboardData];
-
-    // Apply time filter
-    if (timeFilter !== 'all') {
-      const now = new Date();
-      const filterDate = new Date();
-      
-      if (timeFilter === 'week') {
-        filterDate.setDate(now.getDate() - 7);
-      } else if (timeFilter === 'month') {
-        filterDate.setMonth(now.getMonth() - 1);
-      }
-
-      filteredData = filteredData.filter(entry => 
-        new Date(entry.testDate) >= filterDate
-      );
-    }
-
-    // Sort data
-    filteredData.sort((a, b) => {
-      if (sortBy === 'wpm') {
-        return b.wpm - a.wpm;
-      } else {
-        return b.accuracy - a.accuracy;
-      }
-    });
-
-    setLeaderboardData(filteredData);
+    fetchLeaderboardData();
   }, [timeFilter, sortBy]);
+
+  const getDisplayName = (entry: LeaderboardEntry) => {
+    if (entry.profile?.firstName && entry.profile?.lastName) {
+      return `${entry.profile.firstName} ${entry.profile.lastName}`;
+    }
+    return entry.username;
+  };
+
+  const getMetricValue = (entry: LeaderboardEntry) => {
+    switch (sortBy) {
+      case 'accuracy':
+        return `${entry.bestAccuracy}%`;
+      case 'consistency':
+        return entry.consistencyScore ? `${entry.consistencyScore}%` : 'N/A';
+      default:
+        return `${entry.bestWPM}`;
+    }
+  };
 
   const getRankStyle = (rank: number) => {
     if (rank === 1) return 'rank-gold';
@@ -158,6 +115,35 @@ const Leaderboard: React.FC = () => {
     });
   };
 
+  if (loading) {
+    return (
+      <div className="leaderboard-container">
+        <main className="leaderboard-main">
+          <div className="leaderboard-title">
+            <h2>Global Leaderboard</h2>
+            <p>Loading leaderboard data...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="leaderboard-container">
+        <main className="leaderboard-main">
+          <div className="leaderboard-title">
+            <h2>Global Leaderboard</h2>
+            <p>Error: {error}</p>
+            <button onClick={fetchLeaderboardData} style={{padding: '10px 20px', marginTop: '10px'}}>
+              Retry
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="leaderboard-container">
       <main className="leaderboard-main">
@@ -171,23 +157,24 @@ const Leaderboard: React.FC = () => {
             <label>Time Period:</label>
             <select 
               value={timeFilter} 
-              onChange={(e) => setTimeFilter(e.target.value as 'all' | 'week' | 'month')}
+              onChange={(e) => setTimeFilter(e.target.value as 'all' | 'weekly' | 'monthly')}
               className="filter-select"
             >
               <option value="all">All Time</option>
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
+              <option value="weekly">This Week</option>
+              <option value="monthly">This Month</option>
             </select>
           </div>
           <div className="filter-group">
             <label>Sort By:</label>
             <select 
               value={sortBy} 
-              onChange={(e) => setSortBy(e.target.value as 'wpm' | 'accuracy')}
+              onChange={(e) => setSortBy(e.target.value as 'wpm' | 'accuracy' | 'consistency')}
               className="filter-select"
             >
               <option value="wpm">WPM</option>
               <option value="accuracy">Accuracy</option>
+              <option value="consistency">Consistency</option>
             </select>
           </div>
         </div>
@@ -195,38 +182,58 @@ const Leaderboard: React.FC = () => {
         <div className="leaderboard-table">
           <div className="table-header">
             <div className="header-cell rank-col">Rank</div>
-            <div className="header-cell username-col">Username</div>
-            <div className="header-cell wpm-col">WPM</div>
-            <div className="header-cell accuracy-col">Accuracy</div>
-            <div className="header-cell date-col">Date</div>
-            <div className="header-cell characters-col">Characters</div>
+            <div className="header-cell username-col">Name</div>
+            <div className="header-cell wpm-col">Best WPM</div>
+            <div className="header-cell accuracy-col">Best Accuracy</div>
+            <div className="header-cell date-col">Last Test</div>
+            <div className="header-cell characters-col">Total Tests</div>
           </div>
 
           <div className="table-body">
-            {leaderboardData.map((entry, index) => (
-              <div key={entry.id} className={`table-row ${getRankStyle(index + 1)}`}>
+            {leaderboardData.map((entry) => (
+              <div key={entry._id} className={`table-row ${getRankStyle(entry.rank)}`}>
                 <div className="table-cell rank-col">
-                  <span className="rank-number">#{index + 1}</span>
-                  {index < 3 && (
-                    <span className={`medal ${getRankStyle(index + 1)}`}>
-                      {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                  <span className="rank-number">#{entry.rank}</span>
+                  {entry.rank <= 3 && (
+                    <span className={`medal ${getRankStyle(entry.rank)}`}>
+                      {entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : '🥉'}
                     </span>
                   )}
                 </div>
                 <div className="table-cell username-col">
-                  <span className="username">{entry.username}</span>
+                  <div className="user-info">
+                    <div className="profile-picture">
+                      {entry.profile?.avatar ? (
+                        <img 
+                          src={entry.profile.avatar} 
+                          alt={`${getDisplayName(entry)}'s profile`}
+                          className="profile-img"
+                        />
+                      ) : (
+                        <div className="profile-placeholder">
+                          {getDisplayName(entry).charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div className="user-details">
+                      <span className="username">{getDisplayName(entry)}</span>
+                      {entry.profile?.country && (
+                        <span className="country"> ({entry.profile.country})</span>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <div className="table-cell wpm-col">
-                  <span className="wpm-value">{entry.wpm}</span>
+                  <span className="wpm-value">{getMetricValue(entry)}</span>
                 </div>
                 <div className="table-cell accuracy-col">
-                  <span className="accuracy-value">{entry.accuracy}%</span>
+                  <span className="accuracy-value">{entry.bestAccuracy}%</span>
                 </div>
                 <div className="table-cell date-col">
-                  <span className="date-value">{formatDate(entry.testDate)}</span>
+                  <span className="date-value">{formatDate(entry.recentTestDate)}</span>
                 </div>
                 <div className="table-cell characters-col">
-                  <span className="characters-value">{entry.charactersTyped}</span>
+                  <span className="characters-value">{entry.totalTests}</span>
                 </div>
               </div>
             ))}
