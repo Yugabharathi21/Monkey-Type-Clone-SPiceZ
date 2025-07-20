@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import SessionGraph from '../components/SessionGraph';
 import '../styles/TypingTest.css';
 
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
 interface TypingStats {
   wpm: number;
   accuracy: number;
@@ -185,7 +188,7 @@ const TypingTest: React.FC = () => {
         testData.guestId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       }
 
-      const response = await fetch('/api/tests/submit', {
+      const response = await fetch(`${API_BASE_URL}/tests/submit`, {
         method: 'POST',
         headers,
         body: JSON.stringify(testData),

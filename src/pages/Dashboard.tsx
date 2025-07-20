@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import ThemeSelector from '../components/ThemeSelector';
 import '../styles/Dashboard.css';
 
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
 interface TypingSession {
   id: string;
   date: string;
@@ -74,7 +77,7 @@ const Dashboard: React.FC = () => {
         const token = localStorage.getItem('token');
         if (!token) return;
 
-        const response = await fetch('/api/users/profile', {
+        const response = await fetch(`${API_BASE_URL}/users/profile`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -298,7 +301,7 @@ const Dashboard: React.FC = () => {
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      const response = await fetch('/api/users/profile', {
+      const response = await fetch(`${API_BASE_URL}/users/profile`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
