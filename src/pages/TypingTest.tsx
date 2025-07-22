@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import SessionGraph from '../components/SessionGraph';
+import { generateText, getTextOptions } from '../services/textGenerator';
 import '../styles/TypingTest.css';
 
-// API Configuration
+// API Configuration for test submission only
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 interface TypingStats {
@@ -39,6 +40,12 @@ interface TestSubmissionData {
   guestId?: string;
 }
 
+interface TextOptions {
+  categories: string[];
+  difficulties: string[];
+  languages: string[];
+}
+
 const sampleTexts = [
   "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the alphabet.",
   "Programming is not about typing, it's about thinking. Speed comes with practice and understanding.",
@@ -46,15 +53,27 @@ const sampleTexts = [
 ];
 
 const TypingTest: React.FC = () => {
-  const [currentText, setCurrentText] = useState(sampleTexts[0]);
+  const [currentText, setCurrentText] = useState(sampleTexts[0] || "Start typing to begin your test...");
   const [userInput, setUserInput] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false); // Add this to prevent multiple submissions
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [wpmHistory, setWpmHistory] = useState<number[]>([]);
   const [accuracyHistory, setAccuracyHistory] = useState<number[]>([]);
+  
+  // Text configuration state
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('medium');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('english');
+  const [textOptions, setTextOptions] = useState<TextOptions>({
+    categories: ['quotes', 'literature', 'programming', 'common-words'],
+    difficulties: ['easy', 'medium', 'hard'],
+    languages: ['english']
+  });
+  const [isLoadingText, setIsLoadingText] = useState(false);
+  
   const [stats, setStats] = useState<TypingStats>({
     wpm: 0,
     accuracy: 0,
@@ -72,7 +91,7 @@ const TypingTest: React.FC = () => {
   }, [isStarted]);
 
   const calculateStats = React.useCallback((input: string) => {
-    if (!startTime) return;
+    if (!startTime || !currentText) return;
 
     const timeElapsed = (Date.now() - startTime) / 1000 / 60; // in minutes
     const totalCharacters = input.length;
@@ -239,8 +258,8 @@ const TypingTest: React.FC = () => {
           calculateStats(newInput);
         }
       } else if (e.key.length === 1) {
-        // Only allow typing if we haven't reached the end
-        if (userInput.length < currentText.length) {
+        // Only allow typing if we haven't reached the end and currentText exists
+        if (currentText && userInput.length < currentText.length) {
           const newInput = userInput + e.key;
           setUserInput(newInput);
           setCurrentIndex(newInput.length);
@@ -255,7 +274,7 @@ const TypingTest: React.FC = () => {
 
   // Check if test is completed
   useEffect(() => {
-    if (userInput.length === currentText.length && userInput.length > 0 && !isSubmitted) {
+    if (currentText && userInput.length === currentText.length && userInput.length > 0 && !isSubmitted) {
       setIsCompleted(true);
       calculateFinalStats();
       // Submit results to database only once
@@ -285,10 +304,68 @@ const TypingTest: React.FC = () => {
     setCurrentText(sampleTexts[randomIndex]);
   };
 
+  // Load available text options on component mount
+  useEffect(() => {
+    // Load text options from the generator
+    const options = getTextOptions();
+    setTextOptions({
+      categories: options.categories,
+      difficulties: options.difficulties,
+      languages: options.languages
+    });
+    
+    // Load initial text using the generator
+    const initialText = generateText({
+      category: 'literature',
+      difficulty: 'medium',
+      language: 'english'
+    });
+    setCurrentText(initialText.content);
+  }, []);
+
+  // Function to load a new text based on current settings
+  const loadNewText = () => {
+    setIsLoadingText(true);
+    try {
+      const textData = generateText({
+        category: selectedCategory === 'all' ? 'literature' : selectedCategory,
+        difficulty: selectedDifficulty as 'easy' | 'medium' | 'hard',
+        language: selectedLanguage
+      });
+      
+      setCurrentText(textData.content);
+      
+      // Reset test state without changing the text
+      setUserInput('');
+      setCurrentIndex(0);
+      setIsStarted(false);
+      setIsCompleted(false);
+      setIsSubmitted(false);
+      setStartTime(null);
+      setWpmHistory([]);
+      setAccuracyHistory([]);
+      setStats({
+        wpm: 0,
+        accuracy: 0,
+        timeElapsed: 0,
+        totalCharacters: 0,
+        correctCharacters: 0,
+        incorrectCharacters: 0
+      });
+    } catch (error) {
+      console.error('Error loading new text:', error);
+    } finally {
+      setIsLoadingText(false);
+    }
+  };
+
   const renderText = () => {
+    // Safety check to ensure currentText is defined
+    const textToRender = currentText || sampleTexts[0] || "Start typing to begin your test...";
+    
     return (
       <div className="text-content">
-        {currentText.split('').map((char, index) => {
+        {textToRender.split('').map((char, index) => {
           let className = 'char';
           
           if (index < userInput.length) {
@@ -344,6 +421,67 @@ const TypingTest: React.FC = () => {
               Start typing to begin...
             </div>
           )}
+        </div>
+
+        <div className="text-configuration">
+          <div className="config-row">
+            <div className="config-group">
+              <label htmlFor="category-select">Category:</label>
+              <select 
+                id="category-select"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                disabled={isStarted}
+              >
+                <option value="all">All Categories</option>
+                {textOptions.categories.map(category => (
+                  <option key={category} value={category}>
+                    {category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ')}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="config-group">
+              <label htmlFor="difficulty-select">Difficulty:</label>
+              <select 
+                id="difficulty-select"
+                value={selectedDifficulty}
+                onChange={(e) => setSelectedDifficulty(e.target.value)}
+                disabled={isStarted}
+              >
+                {textOptions.difficulties.map(difficulty => (
+                  <option key={difficulty} value={difficulty}>
+                    {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="config-group">
+              <label htmlFor="language-select">Language:</label>
+              <select 
+                id="language-select"
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value)}
+                disabled={isStarted}
+              >
+                {textOptions.languages.map(language => (
+                  <option key={language} value={language}>
+                    {language.charAt(0).toUpperCase() + language.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <button 
+              onClick={loadNewText} 
+              className="control-btn new-text-btn"
+              disabled={isStarted || isLoadingText}
+            >
+              {isLoadingText ? 'Loading...' : 'New Text'}
+            </button>
+          </div>
         </div>
 
         <div className="controls">

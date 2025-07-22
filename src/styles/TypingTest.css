@@ -127,6 +127,83 @@
 
 /* Remove the typing input styles since we no longer use a separate input */
 
+/* Text Configuration Styles */
+.text-configuration {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  width: 100%;
+  max-width: 800px;
+}
+
+.config-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: end;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.config-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 120px;
+}
+
+.config-group label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: lowercase;
+  font-weight: 500;
+}
+
+.config-group select {
+  background: var(--background);
+  border: 2px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.config-group select:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.config-group select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2);
+}
+
+.config-group select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.new-text-btn {
+  background: var(--accent);
+  border: 2px solid var(--accent);
+  color: var(--background);
+  font-weight: 600;
+}
+
+.new-text-btn:hover:not(:disabled) {
+  background: transparent;
+  color: var(--accent);
+}
+
+.new-text-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .controls {
   display: flex;
   gap: 1rem;

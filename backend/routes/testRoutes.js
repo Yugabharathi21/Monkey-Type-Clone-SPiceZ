@@ -9,34 +9,66 @@ const router = express.Router();
 // Get random text for typing test
 router.get('/text', async (req, res) => {
   try {
-    const { category, difficulty, language } = req.query;
+    const { category, difficulty, language, wordCount } = req.query;
     
-    const criteria = {};
-    if (category) criteria.category = category;
-    if (difficulty) criteria.difficulty = difficulty;
-    if (language) criteria.language = language;
+    const criteria = { isActive: true };
+    if (category && category !== 'all') criteria.category = category;
+    if (difficulty && difficulty !== 'all') criteria.difficulty = difficulty;
+    if (language && language !== 'all') criteria.language = language;
 
-    const texts = await TextContent.getRandomText(criteria);
+    // If wordCount is specified, try to find texts within range
+    if (wordCount) {
+      const targetWords = parseInt(wordCount);
+      criteria.wordCount = { $gte: targetWords - 10, $lte: targetWords + 20 };
+    }
+
+    let texts = await TextContent.getRandomText(criteria);
+    
+    // If no texts found with word count criteria, try without it
+    if (texts.length === 0 && wordCount) {
+      delete criteria.wordCount;
+      texts = await TextContent.getRandomText(criteria);
+    }
     
     if (texts.length === 0) {
-      // Fallback to default texts if no custom texts found
-      const defaultTexts = [
-        "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the alphabet.",
-        "Programming is not about typing, it's about thinking. Speed comes with practice and understanding.",
-        "Type like the wind, think like the storm. Every keystroke brings you closer to mastery.",
-        "In the world of keyboards and screens, precision and speed dance together in perfect harmony.",
-        "Practice makes perfect, but perfect practice makes champions. Focus on accuracy first, speed will follow."
-      ];
+      // Enhanced fallback texts organized by difficulty
+      const fallbackTexts = {
+        easy: [
+          "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the alphabet.",
+          "Cats and dogs are popular pets. They bring joy and love to many families around the world.",
+          "Reading books opens new worlds of knowledge and imagination. It is a wonderful way to spend time.",
+          "The sun rises in the east and sets in the west. This happens every single day.",
+          "Music has the power to bring people together. It can make us happy, sad, or excited."
+        ],
+        medium: [
+          "Programming is not about typing, it's about thinking. Speed comes with practice and understanding of algorithms.",
+          "Technology continues to evolve at an unprecedented rate, transforming how we communicate, work, and live our daily lives.",
+          "Climate change presents significant challenges that require innovative solutions and global cooperation among nations.",
+          "The internet has revolutionized access to information, enabling instant communication and learning opportunities worldwide.",
+          "Artificial intelligence and machine learning are reshaping industries and creating new possibilities for automation."
+        ],
+        hard: [
+          "The philosophical implications of consciousness and artificial intelligence continue to challenge our fundamental understanding of cognition, sentience, and the nature of existence itself.",
+          "Quantum entanglement demonstrates the interconnectedness of particles across vast distances, fundamentally challenging our conventional understanding of locality, causality, and the deterministic nature of reality.",
+          "Biotechnology advancements in CRISPR gene editing, personalized medicine, and synthetic biology are revolutionizing healthcare while simultaneously raising complex ethical questions about human enhancement and genetic modification.",
+          "The intersection of neuroscience and technology through brain-computer interfaces promises unprecedented capabilities for treating neurological disorders while potentially transforming human cognitive abilities.",
+          "Sustainable development requires balancing economic growth, environmental conservation, and social equity through innovative approaches that address climate change, resource depletion, and global inequality."
+        ]
+      };
       
-      const randomText = defaultTexts[Math.floor(Math.random() * defaultTexts.length)];
+      const requestedDifficulty = difficulty || 'medium';
+      const availableTexts = fallbackTexts[requestedDifficulty] || fallbackTexts.medium;
+      const randomText = availableTexts[Math.floor(Math.random() * availableTexts.length)];
       
       return res.json({
         text: {
           content: randomText,
-          title: 'Default Practice Text',
+          title: `${requestedDifficulty.charAt(0).toUpperCase() + requestedDifficulty.slice(1)} Practice Text`,
           category: 'default',
-          difficulty: 'medium',
+          difficulty: requestedDifficulty,
           wordCount: randomText.split(' ').length,
+          characterCount: randomText.length,
+          source: 'Built-in Practice Text'
         },
         message: 'Default text retrieved successfully',
       });
@@ -55,6 +87,42 @@ router.get('/text', async (req, res) => {
     console.error('Text retrieval error:', error);
     res.status(500).json({
       error: 'Failed to retrieve text',
+      message: error.message,
+    });
+  }
+});
+
+// Get available categories and difficulties
+router.get('/options', async (req, res) => {
+  try {
+    const options = await TextContent.aggregate([
+      { $match: { isActive: true } },
+      {
+        $group: {
+          _id: null,
+          categories: { $addToSet: '$category' },
+          difficulties: { $addToSet: '$difficulty' },
+          languages: { $addToSet: '$language' }
+        }
+      }
+    ]);
+
+    const result = options[0] || {
+      categories: ['quotes', 'literature', 'programming', 'common-words'],
+      difficulties: ['easy', 'medium', 'hard'],
+      languages: ['english']
+    };
+
+    res.json({
+      categories: result.categories.sort(),
+      difficulties: result.difficulties.sort(),
+      languages: result.languages.sort(),
+      message: 'Options retrieved successfully'
+    });
+  } catch (error) {
+    console.error('Options retrieval error:', error);
+    res.status(500).json({
+      error: 'Failed to retrieve options',
       message: error.message,
     });
   }

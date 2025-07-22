@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/Leaderboard.css';
 
@@ -44,10 +44,9 @@ const Leaderboard: React.FC = () => {
   const [sortBy, setSortBy] = useState<'wpm' | 'accuracy' | 'consistency'>('wpm');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [metadata, setMetadata] = useState<any>(null);
 
   // Fetch leaderboard data from API
-  const fetchLeaderboardData = async () => {
+  const fetchLeaderboardData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -67,7 +66,6 @@ const Leaderboard: React.FC = () => {
 
       const data: LeaderboardResponse = await response.json();
       setLeaderboardData(data.leaderboard);
-      setMetadata(data.metadata);
     } catch (err) {
       console.error('Error fetching leaderboard:', err);
       setError(err instanceof Error ? err.message : 'Failed to load leaderboard data');
@@ -76,11 +74,11 @@ const Leaderboard: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [timeFilter, sortBy]);
 
   useEffect(() => {
     fetchLeaderboardData();
-  }, [timeFilter, sortBy]);
+  }, [timeFilter, sortBy, fetchLeaderboardData]);
 
   const getDisplayName = (entry: LeaderboardEntry) => {
     if (entry.profile?.firstName && entry.profile?.lastName) {
